@@ -3,20 +3,8 @@ import toast from 'react-hot-toast'
 import { ownerApi } from '../../api'
 import BottomNav from '../../components/BottomNav'
 
-// ⚠️ ВАЖНО: Field определён ВНЕ компонента — иначе при каждом keystroke
-// React пересоздаёт тип и unmount/mount инпут → клавиатура закрывается
-const Field = ({ placeholder, value, onChange, type = 'text' }) => (
-  <input
-    type={type}
-    placeholder={placeholder}
-    value={value}
-    onChange={onChange}
-    autoCapitalize="none"
-    autoCorrect="off"
-    spellCheck="false"
-    className="input-field text-[14px] py-3"
-  />
-)
+// Стиль инпута — константа, не создаётся заново при каждом рендере
+const INPUT = 'input-field text-[14px] py-3'
 
 export default function OwnerBarbers() {
   const [barbers, setBarbers] = useState([])
@@ -24,7 +12,9 @@ export default function OwnerBarbers() {
   const [showForm, setShowForm] = useState(false)
   const [expanded, setExpanded] = useState(null)
   const [svcForm, setSvcForm] = useState(null)
-  const [form, setForm] = useState({ first_name: '', last_name: '', phone: '', branch: '', username: '', password: '' })
+  const [form, setForm] = useState({
+    first_name: '', last_name: '', phone: '', branch: '', username: '', password: ''
+  })
   const [svc, setSvc] = useState({ name: '', price: '' })
   const [loading, setLoading] = useState(false)
 
@@ -33,6 +23,11 @@ export default function OwnerBarbers() {
   async function load() {
     const [b, br] = await Promise.all([ownerApi.getBarbers(), ownerApi.getBranches()])
     setBarbers(b.data); setBranches(br.data)
+  }
+
+  // Один универсальный обработчик для формы барбера
+  function setField(key, val) {
+    setForm(f => ({ ...f, [key]: val }))
   }
 
   async function create() {
@@ -76,7 +71,7 @@ export default function OwnerBarbers() {
       </header>
 
       <div className="px-4 space-y-3">
-        <button onClick={() => setShowForm(!showForm)}
+        <button onClick={() => setShowForm(v => !v)}
           className={showForm ? 'btn-outline' : 'btn-primary'}>
           {showForm
             ? <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Отмена</>
@@ -85,46 +80,63 @@ export default function OwnerBarbers() {
         </button>
 
         {showForm && (
-          <div className="card space-y-3 asi">
+          <div className="card space-y-3">
             <p className="text-[15px] font-bold text-white">Новый барбер</p>
+
+            {/* Прямые <input> без обёрток — стабильный фокус на мобиле */}
             <div className="grid grid-cols-2 gap-2">
-              <Field
+              <input
+                className={INPUT}
                 placeholder="Имя"
                 value={form.first_name}
-                onChange={(e) => setForm(f => ({ ...f, first_name: e.target.value }))}
+                autoCapitalize="words"
+                autoCorrect="off"
+                onChange={e => setField('first_name', e.target.value)}
               />
-              <Field
+              <input
+                className={INPUT}
                 placeholder="Фамилия"
                 value={form.last_name}
-                onChange={(e) => setForm(f => ({ ...f, last_name: e.target.value }))}
+                autoCapitalize="words"
+                autoCorrect="off"
+                onChange={e => setField('last_name', e.target.value)}
               />
             </div>
-            <Field
+            <input
+              className={INPUT}
               placeholder="Телефон"
               value={form.phone}
-              onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))}
+              type="tel"
+              onChange={e => setField('phone', e.target.value)}
             />
             <select
               value={form.branch}
-              onChange={(e) => setForm(f => ({ ...f, branch: e.target.value }))}
+              onChange={e => setField('branch', e.target.value)}
               className="input-field"
               style={{ color: form.branch ? '#f8fafc' : 'rgba(255,255,255,0.2)' }}>
               <option value="">Выберите филиал</option>
-              {branches.map((b) => (
+              {branches.map(b => (
                 <option key={b.id} value={b.id} style={{ color: '#000' }}>{b.name}</option>
               ))}
             </select>
             <div className="grid grid-cols-2 gap-2">
-              <Field
+              <input
+                className={INPUT}
                 placeholder="Логин"
                 value={form.username}
-                onChange={(e) => setForm(f => ({ ...f, username: e.target.value }))}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                onChange={e => setField('username', e.target.value)}
               />
-              <Field
+              <input
+                className={INPUT}
                 placeholder="Пароль"
                 type="password"
                 value={form.password}
-                onChange={(e) => setForm(f => ({ ...f, password: e.target.value }))}
+                autoCapitalize="none"
+                autoCorrect="off"
+                onChange={e => setField('password', e.target.value)}
               />
             </div>
             <button onClick={create} disabled={loading} className="btn-primary">
@@ -161,7 +173,7 @@ export default function OwnerBarbers() {
                 </p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <button onClick={() => setExpanded(expanded === barber.id ? null : barber.id)}
+                <button onClick={() => setExpanded(v => v === barber.id ? null : barber.id)}
                   className="w-8 h-8 rounded-xl flex items-center justify-center"
                   style={{ background: '#1a1a1f' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
@@ -190,7 +202,7 @@ export default function OwnerBarbers() {
                   <p className="text-[13px] mb-3" style={{ color: 'rgba(255,255,255,0.2)' }}>Нет услуг</p>}
 
                 <div className="space-y-[6px] mb-3">
-                  {barber.services?.map((s) => (
+                  {barber.services?.map(s => (
                     <div key={s.id} className="flex items-center justify-between px-3 py-[10px] rounded-xl"
                       style={{ background: '#0f0f12' }}>
                       <span className="text-[13px] font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.name}</span>
@@ -207,21 +219,21 @@ export default function OwnerBarbers() {
                 </div>
 
                 {svcForm === barber.id ? (
-                  <div className="space-y-2 asi">
+                  <div className="space-y-2">
                     <div className="grid grid-cols-2 gap-2">
                       <input
                         placeholder="Название"
                         value={svc.name}
-                        onChange={(e) => setSvc(s => ({ ...s, name: e.target.value }))}
+                        onChange={e => setSvc(s => ({ ...s, name: e.target.value }))}
                         autoCorrect="off"
-                        spellCheck="false"
+                        spellCheck={false}
                         className="input-field text-[13px] py-3"
                       />
                       <input
                         type="number"
                         placeholder="Цена"
                         value={svc.price}
-                        onChange={(e) => setSvc(s => ({ ...s, price: e.target.value }))}
+                        onChange={e => setSvc(s => ({ ...s, price: e.target.value }))}
                         className="input-field text-[13px] py-3"
                       />
                     </div>
