@@ -1,15 +1,5 @@
 import { useState, useEffect } from 'react'
 
-/**
- * PWA Install Button
- *
- * Логика:
- *  1. Если уже запущено как PWA (standalone) — скрываем
- *  2. Android/Desktop Chrome+Edge по HTTPS — нативный prompt
- *  3. iOS Safari — кнопка + инструкция (Share → На экран «Домой»)
- *  4. Все остальные (HTTP, Firefox, Samsung и т.д.) — универсальная инструкция
- */
-
 function getOS() {
   const ua = navigator.userAgent
   if (/iphone|ipad|ipod/i.test(ua)) return 'ios'
@@ -27,15 +17,15 @@ function getBrowser() {
   return 'other'
 }
 
-// Инструкции по браузерам/ОС
 const GUIDES = {
   ios: [
-    { icon: '⬆️', text: 'Нажми кнопку «Поделиться» внизу Safari' },
-    { icon: '📲', text: 'Выбери «На экран "Домой"»' },
-    { icon: '✅', text: 'Нажми «Добавить»' },
+    { icon: '⬆️', text: 'Нажми кнопку «Поделиться» (квадрат со стрелкой вверх) в нижней панели Safari' },
+    { icon: '📜', text: 'Прокрути список действий вниз — найди «На экран "Домой"»' },
+    { icon: '📲', text: 'Нажми «На экран "Домой"»' },
+    { icon: '✅', text: 'Нажми «Добавить» в правом верхнем углу' },
   ],
   android_chrome: [
-    { icon: '⋮', text: 'Нажми «⋮» (три точки) в правом верхнем углу' },
+    { icon: '⋮', text: 'Нажми «⋮» (три точки) в правом верхнем углу Chrome' },
     { icon: '📲', text: 'Выбери «Добавить на главный экран»' },
     { icon: '✅', text: 'Нажми «Добавить»' },
   ],
@@ -74,7 +64,7 @@ function getGuide() {
 
 export default function InstallPWA({ className = '' }) {
   const [installed, setInstalled] = useState(false)
-  const [prompt, setPrompt]       = useState(null)   // нативный beforeinstallprompt
+  const [prompt, setPrompt] = useState(null)
   const [showGuide, setShowGuide] = useState(false)
   const [dismissed, setDismissed] = useState(false)
 
@@ -88,12 +78,12 @@ export default function InstallPWA({ className = '' }) {
       return
     }
 
-    // Проверяем localStorage — пользователь уже закрыл баннер
+    // Проверяем localStorage
     if (localStorage.getItem('pwa-dismissed') === '1') {
       setDismissed(true)
     }
 
-    // Нативный prompt (Chrome/Edge по HTTPS)
+    // Нативный prompt (Chrome/Edge HTTPS)
     const handler = (e) => {
       e.preventDefault()
       setPrompt(e)
@@ -111,12 +101,10 @@ export default function InstallPWA({ className = '' }) {
     setDismissed(true)
   }
 
-  // Уже установлено или пользователь закрыл
   if (installed || dismissed) return null
 
   const { title, steps } = getGuide()
 
-  // Нативный prompt доступен (Chrome/Edge HTTPS)
   async function handleNativeInstall() {
     prompt.prompt()
     const { outcome } = await prompt.userChoice
@@ -125,16 +113,12 @@ export default function InstallPWA({ className = '' }) {
 
   return (
     <>
-      {/* Баннер-кнопка */}
+      {/* Баннер */}
       <button
         onClick={() => prompt ? handleNativeInstall() : setShowGuide(true)}
         className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl transition-all active:scale-95 ${className}`}
-        style={{
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.1)',
-        }}
+        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
       >
-        {/* Иконка */}
         <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{ background: '#1a1a1f', border: '1px solid rgba(255,255,255,0.08)' }}>
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
@@ -144,77 +128,58 @@ export default function InstallPWA({ className = '' }) {
             <line x1="12" y1="15" x2="12" y2="3"/>
           </svg>
         </div>
-
-        {/* Текст */}
         <div className="flex-1 text-left">
-          <p className="text-[13px] font-semibold text-white leading-tight">
-            Установить приложение
-          </p>
-          <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
-            Добавить на главный экран
-          </p>
+          <p className="text-[13px] font-semibold text-white leading-tight">Установить приложение</p>
+          <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.3)' }}>Добавить на главный экран</p>
         </div>
-
-        {/* Стрелка */}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
           stroke="rgba(255,255,255,0.2)" strokeWidth="2" strokeLinecap="round">
           <polyline points="9 18 15 12 9 6"/>
         </svg>
-
-        {/* Кнопка закрыть */}
         <div
-          role="button"
-          tabIndex={0}
+          role="button" tabIndex={0}
           onClick={e => { e.stopPropagation(); dismiss() }}
           onKeyDown={e => e.key === 'Enter' && (e.stopPropagation(), dismiss())}
-          className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{ background: 'rgba(255,255,255,0.06)' }}
-        >
+          className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{ background: 'rgba(255,255,255,0.08)' }}>
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
-            stroke="rgba(255,255,255,0.3)" strokeWidth="2.5">
+            stroke="rgba(255,255,255,0.4)" strokeWidth="2.5">
             <line x1="18" y1="6" x2="6" y2="18"/>
             <line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </div>
       </button>
 
-      {/* Модальная инструкция */}
+      {/* Инструкция */}
       {showGuide && (
         <div
           className="fixed inset-0 z-[999] flex items-end"
-          style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }}
-          onClick={() => setShowGuide(false)}
-        >
+          style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)' }}
+          onClick={() => setShowGuide(false)}>
           <div
             className="w-full rounded-t-3xl p-6 asi"
             style={{ background: '#1a1a1f', border: '1px solid rgba(255,255,255,0.1)' }}
-            onClick={e => e.stopPropagation()}
-          >
-            {/* Ручка */}
+            onClick={e => e.stopPropagation()}>
             <div className="w-10 h-1 rounded-full mx-auto mb-6"
               style={{ background: 'rgba(255,255,255,0.15)' }} />
-
             <h3 className="text-white font-bold text-[18px] mb-6 text-center">{title}</h3>
-
             <div className="space-y-4 mb-6">
               {steps.map(({ icon, text }, i) => (
-                <div key={i} className="flex items-center gap-4">
+                <div key={i} className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-[20px] flex-shrink-0"
                     style={{ background: '#111113', border: '1px solid rgba(255,255,255,0.08)' }}>
                     {icon}
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 pt-1">
                     <span className="text-white font-semibold text-[13px]">Шаг {i + 1}: </span>
                     <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{text}</span>
                   </div>
                 </div>
               ))}
             </div>
-
             <button onClick={() => setShowGuide(false)} className="btn-primary">
               Понял, закрыть
             </button>
-
             <button
               onClick={() => { setShowGuide(false); dismiss() }}
               className="w-full mt-3 py-3 text-[13px] text-center"

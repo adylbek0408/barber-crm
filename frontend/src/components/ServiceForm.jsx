@@ -2,8 +2,12 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { barberApi } from '../api'
 
-export default function ServiceForm({ onCreated }) {
-  const [form, setForm] = useState({ name: '', price: '' })
+export default function ServiceForm({ onDone, service = null }) {
+  const isEdit = !!service
+  const [form, setForm] = useState({
+    name: service?.name || '',
+    price: service?.price || '',
+  })
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit() {
@@ -13,10 +17,14 @@ export default function ServiceForm({ onCreated }) {
     }
     setLoading(true)
     try {
-      await barberApi.createService({ name: form.name, price: form.price })
-      toast.success('Услуга добавлена!')
-      setForm({ name: '', price: '' })
-      onCreated()
+      if (isEdit) {
+        await barberApi.updateService(service.id, { name: form.name, price: form.price })
+        toast.success('Услуга обновлена!')
+      } else {
+        await barberApi.createService({ name: form.name, price: form.price })
+        toast.success('Услуга добавлена!')
+      }
+      onDone()
     } catch (e) {
       const err = e.response?.data
       const msg = typeof err === 'string'
@@ -30,7 +38,7 @@ export default function ServiceForm({ onCreated }) {
 
   return (
     <div className="glass-card space-y-3 asi mb-4">
-      <p className="text-white font-bold">Новая услуга</p>
+      <p className="text-white font-bold">{isEdit ? 'Редактировать услугу' : 'Новая услуга'}</p>
       <input
         placeholder="Название (напр. Стрижка)"
         value={form.name}
@@ -48,7 +56,7 @@ export default function ServiceForm({ onCreated }) {
         className="input-field"
       />
       <button onClick={handleSubmit} disabled={loading} className="btn-primary">
-        {loading ? 'Сохраняем...' : 'Сохранить'}
+        {loading ? 'Сохраняем...' : isEdit ? 'Сохранить изменения' : 'Сохранить'}
       </button>
     </div>
   )
