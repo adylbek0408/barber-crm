@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head><title>Generate PWA Icons</title></head>
+<body>
+<h3>Generating PWA icons... check console</h3>
+<canvas id="c"></canvas>
+<div id="links"></div>
+<script>
+const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="96" fill="#09090b"/>
+  <g transform="translate(256,256)">
+    <circle cx="-70" cy="-70" r="32" fill="none" stroke="#f8fafc" stroke-width="20"/>
+    <circle cx="70" cy="-70" r="32" fill="none" stroke="#f8fafc" stroke-width="20"/>
+    <line x1="-52" y1="-52" x2="90" y2="90" stroke="#f8fafc" stroke-width="20" stroke-linecap="round"/>
+    <line x1="52" y1="-52" x2="-90" y2="90" stroke="#f8fafc" stroke-width="20" stroke-linecap="round"/>
+    <circle cx="0" cy="20" r="10" fill="#f8fafc"/>
+  </g>
+  <rect x="156" y="400" width="200" height="16" rx="8" fill="#d4a843"/>
+</svg>`;
+
+// Maskable version (with safe zone padding ~10%)
+const svgMaskable = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#09090b"/>
+  <g transform="translate(256,256) scale(0.8)">
+    <circle cx="-70" cy="-70" r="32" fill="none" stroke="#f8fafc" stroke-width="20"/>
+    <circle cx="70" cy="-70" r="32" fill="none" stroke="#f8fafc" stroke-width="20"/>
+    <line x1="-52" y1="-52" x2="90" y2="90" stroke="#f8fafc" stroke-width="20" stroke-linecap="round"/>
+    <line x1="52" y1="-52" x2="-90" y2="90" stroke="#f8fafc" stroke-width="20" stroke-linecap="round"/>
+    <circle cx="0" cy="20" r="10" fill="#f8fafc"/>
+  </g>
+  <rect x="176" y="410" width="160" height="14" rx="7" fill="#d4a843"/>
+</svg>`;
+
+const icons = [
+  { name: 'icon-192.png',          size: 192, svg: svgStr      },
+  { name: 'icon-512.png',          size: 512, svg: svgStr      },
+  { name: 'icon-maskable-192.png', size: 192, svg: svgMaskable },
+  { name: 'icon-maskable-512.png', size: 512, svg: svgMaskable },
+];
+
+const linksDiv = document.getElementById('links');
+
+icons.forEach(({ name, size, svg }) => {
+  const img = new Image();
+  const blob = new Blob([svg], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, size, size);
+    URL.revokeObjectURL(url);
+
+    canvas.toBlob((pngBlob) => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(pngBlob);
+      a.download = name;
+      a.textContent = `⬇ Скачать ${name} (${size}x${size})`;
+      a.style.cssText = 'display:block;margin:8px;padding:10px 16px;background:#09090b;color:#fff;border-radius:8px;text-decoration:none;font-family:sans-serif;width:fit-content;';
+      linksDiv.appendChild(a);
+
+      const preview = document.createElement('img');
+      preview.src = a.href;
+      preview.width = size > 192 ? 64 : size/3;
+      preview.style.cssText = 'margin:4px;border-radius:8px;';
+      linksDiv.appendChild(preview);
+
+      linksDiv.appendChild(document.createElement('br'));
+    }, 'image/png');
+  };
+  img.src = url;
+});
+</script>
+</body>
+</html>

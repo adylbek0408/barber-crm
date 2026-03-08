@@ -2,9 +2,36 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-    <meta name="theme-color" content="#1a1a2e" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <!-- PWA основное -->
+    <meta name="theme-color" content="#09090b" />
     <link rel="manifest" href="/manifest.json" />
+
+    <!-- PWA: отображение как приложение (скрыть браузерный UI) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="BarberCRM" />
+
+    <!-- Иконки для iOS (Apple не использует manifest) -->
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png" />
+
+    <!-- Иконка для браузера -->
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+
+    <!-- SEO / описание -->
+    <meta name="description" content="CRM система для барбершопов" />
+    <meta name="application-name" content="BarberCRM" />
+
+    <!-- Убрать подсветку тапа на iOS -->
+    <style>
+      * { -webkit-tap-highlight-color: transparent; }
+      body { overscroll-behavior: none; }
+    </style>
+
     <title>BarberCRM</title>
   </head>
   <body>
