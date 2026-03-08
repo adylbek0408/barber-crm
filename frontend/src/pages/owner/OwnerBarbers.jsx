@@ -3,32 +3,71 @@ import toast from 'react-hot-toast'
 import { ownerApi } from '../../api'
 import BottomNav from '../../components/BottomNav'
 
-// Стиль инпута — константа, не создаётся заново при каждом рендере
 const INPUT = 'input-field text-[14px] py-3'
+
+// Кастомный диалог подтверждения
+function ConfirmModal({ text, onConfirm, onCancel, loading }) {
+  return (
+    <div className="fixed inset-0 z-[999] flex items-center justify-center px-6"
+      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }}>
+      <div className="w-full max-w-xs rounded-3xl p-6"
+        style={{ background: '#1a1a1f', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <h3 className="text-white font-bold text-[17px] mb-2 text-center">{text}</h3>
+        <p className="text-center text-[13px] mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          Это действие нельзя отменить
+        </p>
+        <button onClick={onConfirm} disabled={loading}
+          className="w-full py-3 rounded-2xl font-semibold text-[15px] mb-3"
+          style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }}>
+          {loading ? 'Удаляем...' : 'Удалить'}
+        </button>
+        <button onClick={onCancel}
+          className="w-full py-3 rounded-2xl font-semibold text-[15px]"
+          style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}>
+          Отмена
+        </button>
+      </div>
+    </div>
+  )
+}
 
 export default function OwnerBarbers() {
   const [barbers, setBarbers] = useState([])
   const [branches, setBranches] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [expanded, setExpanded] = useState(null)
-  const [svcForm, setSvcForm] = useState(null)
-  const [form, setForm] = useState({
-    first_name: '', last_name: '', phone: '', branch: '', username: '', password: ''
-  })
-  const [svc, setSvc] = useState({ name: '', price: '' })
+
+  // Форма добавления барбера
+  const [form, setForm] = useState({ first_name: '', last_name: '', phone: '', branch: '', username: '', password: '' })
   const [loading, setLoading] = useState(false)
+
+  // Удаление барбера
+  const [deleteBarber, setDeleteBarber] = useState(null)
+  const [deletingBarber, setDeletingBarber] = useState(false)
+
+  // Услуги — добавление
+  const [svcForm, setSvcForm] = useState(null)
+  const [svc, setSvc] = useState({ name: '', price: '' })
+
+  // Услуги — редактирование
+  const [editSvc, setEditSvc] = useState(null)    // { id, name, price }
+  const [editSvcData, setEditSvcData] = useState({ name: '', price: '' })
+  const [savingSvc, setSavingSvc] = useState(false)
+
+  // Удаление услуги
+  const [deleteSvc, setDeleteSvc] = useState(null)
+  const [deletingSvc, setDeletingSvc] = useState(false)
 
   useEffect(() => { load() }, [])
 
   async function load() {
-    const [b, br] = await Promise.all([ownerApi.getBarbers(), ownerApi.getBranches()])
-    setBarbers(b.data); setBranches(br.data)
+    try {
+      const [b, br] = await Promise.all([ownerApi.getBarbers(), ownerApi.getBranches()])
+      setBarbers(b.data); setBranches(br.data)
+    } catch { toast.error('Ошибка загрузки') }
   }
 
-  // Один универсальный обработчик для формы барбера
-  function setField(key, val) {
-    setForm(f => ({ ...f, [key]: val }))
-  }
+  function setField(key, val) { setForm(f => ({ ...f, [key]: val })) }
 
   async function create() {
     if (!form.first_name || !form.username || !form.password || !form.branch) {
@@ -45,24 +84,70 @@ export default function OwnerBarbers() {
     finally { setLoading(false) }
   }
 
-  async function del(id) {
-    if (!confirm('Удалить барбера?')) return
-    await ownerApi.deleteBarber(id); toast.success('Удалён'); load()
+  async function confirmDeleteBarber() {
+    setDeletingBarber(true)
+    try {
+      await ownerApi.deleteBarber(deleteBarber)
+      toast.success('Барбер удалён')
+      setDeleteBarber(null)
+      load()
+    } catch { toast.error('Ошибка удаления') }
+    finally { setDeletingBarber(false) }
   }
 
   async function addSvc(bid) {
-    if (!svc.name || !svc.price) return
+    if (!svc.name || !svc.price) { toast.error('Заполните поля'); return }
     try {
       await ownerApi.createService({ barber: bid, ...svc })
-      toast.success('Добавлено')
+      toast.success('Услуга добавлена')
       setSvcForm(null); setSvc({ name: '', price: '' }); load()
     } catch { toast.error('Ошибка') }
   }
 
-  async function delSvc(id) { await ownerApi.deleteService(id); load() }
+  async function saveEditSvc() {
+    if (!editSvcData.name || !editSvcData.price) { toast.error('Заполните поля'); return }
+    setSavingSvc(true)
+    try {
+      await ownerApi.updateService(editSvc, { name: editSvcData.name, price: editSvcData.price })
+      toast.success('Услуга обновлена')
+      setEditSvc(null); load()
+    } catch { toast.error('Ошибка') }
+    finally { setSavingSvc(false) }
+  }
+
+  async function confirmDeleteSvc() {
+    setDeletingSvc(true)
+    try {
+      await ownerApi.deleteService(deleteSvc)
+      toast.success('Услуга удалена')
+      setDeleteSvc(null); load()
+    } catch { toast.error('Ошибка') }
+    finally { setDeletingSvc(false) }
+  }
 
   return (
     <div className="min-h-screen pb-28" style={{ background: '#09090b' }}>
+
+      {/* Модал удаления барбера */}
+      {deleteBarber && (
+        <ConfirmModal
+          text="Удалить барбера?"
+          loading={deletingBarber}
+          onConfirm={confirmDeleteBarber}
+          onCancel={() => setDeleteBarber(null)}
+        />
+      )}
+
+      {/* Модал удаления услуги */}
+      {deleteSvc && (
+        <ConfirmModal
+          text="Удалить услугу?"
+          loading={deletingSvc}
+          onConfirm={confirmDeleteSvc}
+          onCancel={() => setDeleteSvc(null)}
+        />
+      )}
+
       <header className="px-5 pt-12 pb-5">
         <h1 className="text-[24px] font-black text-white">Барберы</h1>
         <p className="text-[13px] mt-1" style={{ color: 'rgba(255,255,255,0.25)' }}>
@@ -82,36 +167,17 @@ export default function OwnerBarbers() {
         {showForm && (
           <div className="card space-y-3">
             <p className="text-[15px] font-bold text-white">Новый барбер</p>
-
-            {/* Прямые <input> без обёрток — стабильный фокус на мобиле */}
             <div className="grid grid-cols-2 gap-2">
-              <input
-                className={INPUT}
-                placeholder="Имя"
-                value={form.first_name}
-                autoCapitalize="words"
-                autoCorrect="off"
-                onChange={e => setField('first_name', e.target.value)}
-              />
-              <input
-                className={INPUT}
-                placeholder="Фамилия"
-                value={form.last_name}
-                autoCapitalize="words"
-                autoCorrect="off"
-                onChange={e => setField('last_name', e.target.value)}
-              />
+              <input className={INPUT} placeholder="Имя" value={form.first_name}
+                autoCapitalize="words" autoCorrect="off"
+                onChange={e => setField('first_name', e.target.value)} />
+              <input className={INPUT} placeholder="Фамилия" value={form.last_name}
+                autoCapitalize="words" autoCorrect="off"
+                onChange={e => setField('last_name', e.target.value)} />
             </div>
-            <input
-              className={INPUT}
-              placeholder="Телефон"
-              value={form.phone}
-              type="tel"
-              onChange={e => setField('phone', e.target.value)}
-            />
-            <select
-              value={form.branch}
-              onChange={e => setField('branch', e.target.value)}
+            <input className={INPUT} placeholder="Телефон" value={form.phone}
+              type="tel" onChange={e => setField('phone', e.target.value)} />
+            <select value={form.branch} onChange={e => setField('branch', e.target.value)}
               className="input-field"
               style={{ color: form.branch ? '#f8fafc' : 'rgba(255,255,255,0.2)' }}>
               <option value="">Выберите филиал</option>
@@ -120,24 +186,12 @@ export default function OwnerBarbers() {
               ))}
             </select>
             <div className="grid grid-cols-2 gap-2">
-              <input
-                className={INPUT}
-                placeholder="Логин"
-                value={form.username}
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck={false}
-                onChange={e => setField('username', e.target.value)}
-              />
-              <input
-                className={INPUT}
-                placeholder="Пароль"
-                type="password"
-                value={form.password}
-                autoCapitalize="none"
-                autoCorrect="off"
-                onChange={e => setField('password', e.target.value)}
-              />
+              <input className={INPUT} placeholder="Логин" value={form.username}
+                autoCapitalize="none" autoCorrect="off" spellCheck={false}
+                onChange={e => setField('username', e.target.value)} />
+              <input className={INPUT} placeholder="Пароль" type="password" value={form.password}
+                autoCapitalize="none" autoCorrect="off"
+                onChange={e => setField('password', e.target.value)} />
             </div>
             <button onClick={create} disabled={loading} className="btn-primary">
               {loading ? 'Создаём...' : 'Создать'}
@@ -182,7 +236,7 @@ export default function OwnerBarbers() {
                     <polyline points="6 9 12 15 18 9"/>
                   </svg>
                 </button>
-                <button onClick={() => del(barber.id)}
+                <button onClick={() => setDeleteBarber(barber.id)}
                   className="w-8 h-8 rounded-xl flex items-center justify-center"
                   style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)' }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2">
@@ -203,39 +257,90 @@ export default function OwnerBarbers() {
 
                 <div className="space-y-[6px] mb-3">
                   {barber.services?.map(s => (
-                    <div key={s.id} className="flex items-center justify-between px-3 py-[10px] rounded-xl"
-                      style={{ background: '#0f0f12' }}>
-                      <span className="text-[13px] font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.name}</span>
-                      <div className="flex items-center gap-3">
-                        <span className="text-[13px] font-semibold text-white">{Number(s.price).toLocaleString()} сом</span>
-                        <button onClick={() => delSvc(s.id)} style={{ color: 'rgba(255,255,255,0.15)' }}>
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                          </svg>
-                        </button>
-                      </div>
+                    <div key={s.id}>
+                      {/* Режим редактирования */}
+                      {editSvc === s.id ? (
+                        <div className="rounded-xl p-3 space-y-2" style={{ background: '#0f0f12' }}>
+                          <div className="grid grid-cols-2 gap-2">
+                            <input
+                              className="input-field text-[13px] py-2"
+                              placeholder="Название"
+                              value={editSvcData.name}
+                              autoCorrect="off"
+                              onChange={e => setEditSvcData(d => ({ ...d, name: e.target.value }))}
+                            />
+                            <input
+                              className="input-field text-[13px] py-2"
+                              placeholder="Цена"
+                              type="number"
+                              inputMode="numeric"
+                              value={editSvcData.price}
+                              onChange={e => setEditSvcData(d => ({ ...d, price: e.target.value }))}
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <button onClick={saveEditSvc} disabled={savingSvc}
+                              className="py-2 rounded-xl text-[13px] font-semibold"
+                              style={{ background: 'rgba(255,255,255,0.1)', color: '#fff' }}>
+                              {savingSvc ? 'Сохр...' : 'Сохранить'}
+                            </button>
+                            <button onClick={() => setEditSvc(null)}
+                              className="py-2 rounded-xl text-[13px] font-semibold"
+                              style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.4)' }}>
+                              Отмена
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        /* Обычный вид */
+                        <div className="flex items-center justify-between px-3 py-[10px] rounded-xl"
+                          style={{ background: '#0f0f12' }}>
+                          <span className="text-[13px] font-medium flex-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                            {s.name}
+                          </span>
+                          <span className="text-[13px] font-semibold text-white mr-3">
+                            {Number(s.price).toLocaleString()} сом
+                          </span>
+                          {/* Редактировать */}
+                          <button
+                            onClick={() => { setEditSvc(s.id); setEditSvcData({ name: s.name, price: s.price }) }}
+                            className="w-7 h-7 rounded-lg flex items-center justify-center mr-1"
+                            style={{ background: 'rgba(255,255,255,0.06)' }}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                              stroke="rgba(255,255,255,0.4)" strokeWidth="2">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                            </svg>
+                          </button>
+                          {/* Удалить */}
+                          <button
+                            onClick={() => setDeleteSvc(s.id)}
+                            className="w-7 h-7 rounded-lg flex items-center justify-center"
+                            style={{ background: 'rgba(239,68,68,0.08)' }}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                              stroke="#f87171" strokeWidth="2.5">
+                              <line x1="18" y1="6" x2="6" y2="18"/>
+                              <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
 
+                {/* Форма добавления услуги */}
                 {svcForm === barber.id ? (
                   <div className="space-y-2">
                     <div className="grid grid-cols-2 gap-2">
-                      <input
-                        placeholder="Название"
-                        value={svc.name}
+                      <input placeholder="Название" value={svc.name}
                         onChange={e => setSvc(s => ({ ...s, name: e.target.value }))}
-                        autoCorrect="off"
-                        spellCheck={false}
-                        className="input-field text-[13px] py-3"
-                      />
-                      <input
-                        type="number"
-                        placeholder="Цена"
+                        autoCorrect="off" spellCheck={false}
+                        className="input-field text-[13px] py-3" />
+                      <input type="number" inputMode="numeric" placeholder="Цена"
                         value={svc.price}
                         onChange={e => setSvc(s => ({ ...s, price: e.target.value }))}
-                        className="input-field text-[13px] py-3"
-                      />
+                        className="input-field text-[13px] py-3" />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <button onClick={() => addSvc(barber.id)} className="btn-primary py-3 text-[13px]">Добавить</button>
@@ -243,7 +348,7 @@ export default function OwnerBarbers() {
                     </div>
                   </div>
                 ) : (
-                  <button onClick={() => setSvcForm(barber.id)}
+                  <button onClick={() => { setSvcForm(barber.id); setSvc({ name: '', price: '' }) }}
                     className="w-full py-[11px] rounded-xl text-[13px] font-medium flex items-center justify-center gap-2 transition-all active:scale-95"
                     style={{ border: '1px dashed rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.3)' }}>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
