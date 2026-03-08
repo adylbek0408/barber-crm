@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { barberApi } from '../../api'
 import useAuthStore from '../../store/authStore'
+import InstallPWA from '../../components/InstallPWA'
 
 const S = { SELECT: 'select', PAY: 'pay', DONE: 'done' }
 const TAB = { WORK: 'work', SERVICES: 'services' }
@@ -101,6 +102,11 @@ export default function BarberHome() {
           </button>
         </div>
       </header>
+
+      {/* PWA install — показывается только если не установлено */}
+      <div className="px-4 pb-1">
+        <InstallPWA />
+      </div>
 
       {/* Табы */}
       <div className="px-4 pb-3 flex gap-2">

@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import { ownerApi } from '../../api'
 import useAuthStore from '../../store/authStore'
 import BottomNav from '../../components/BottomNav'
+import InstallPWA from '../../components/InstallPWA'
 
 const Tip = ({ active, payload }) => {
   if (!active || !payload?.length) return null
@@ -95,6 +96,9 @@ export default function OwnerDashboard() {
             </svg>
           </button>
         </div>
+
+        {/* PWA install */}
+        <InstallPWA className="mb-3" />
 
         {/* Выбор месяца */}
         <label htmlFor="mpick"

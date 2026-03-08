@@ -3,14 +3,29 @@ import toast from 'react-hot-toast'
 import { ownerApi } from '../../api'
 import BottomNav from '../../components/BottomNav'
 
+// ⚠️ ВАЖНО: Field определён ВНЕ компонента — иначе при каждом keystroke
+// React пересоздаёт тип и unmount/mount инпут → клавиатура закрывается
+const Field = ({ placeholder, value, onChange, type = 'text' }) => (
+  <input
+    type={type}
+    placeholder={placeholder}
+    value={value}
+    onChange={onChange}
+    autoCapitalize="none"
+    autoCorrect="off"
+    spellCheck="false"
+    className="input-field text-[14px] py-3"
+  />
+)
+
 export default function OwnerBarbers() {
   const [barbers, setBarbers] = useState([])
   const [branches, setBranches] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [expanded, setExpanded] = useState(null)
   const [svcForm, setSvcForm] = useState(null)
-  const [form, setForm] = useState({ first_name:'', last_name:'', phone:'', branch:'', username:'', password:'' })
-  const [svc, setSvc] = useState({ name:'', price:'' })
+  const [form, setForm] = useState({ first_name: '', last_name: '', phone: '', branch: '', username: '', password: '' })
+  const [svc, setSvc] = useState({ name: '', price: '' })
   const [loading, setLoading] = useState(false)
 
   useEffect(() => { load() }, [])
@@ -25,9 +40,14 @@ export default function OwnerBarbers() {
       toast.error('Заполните все поля'); return
     }
     setLoading(true)
-    try { await ownerApi.createBarber(form); toast.success('Создан!'); setShowForm(false)
-      setForm({ first_name:'', last_name:'', phone:'', branch:'', username:'', password:'' }); load()
-    } catch { toast.error('Ошибка') } finally { setLoading(false) }
+    try {
+      await ownerApi.createBarber(form)
+      toast.success('Создан!')
+      setShowForm(false)
+      setForm({ first_name: '', last_name: '', phone: '', branch: '', username: '', password: '' })
+      load()
+    } catch { toast.error('Ошибка') }
+    finally { setLoading(false) }
   }
 
   async function del(id) {
@@ -37,19 +57,14 @@ export default function OwnerBarbers() {
 
   async function addSvc(bid) {
     if (!svc.name || !svc.price) return
-    try { await ownerApi.createService({ barber: bid, ...svc }); toast.success('Добавлено')
-      setSvcForm(null); setSvc({ name:'', price:'' }); load()
+    try {
+      await ownerApi.createService({ barber: bid, ...svc })
+      toast.success('Добавлено')
+      setSvcForm(null); setSvc({ name: '', price: '' }); load()
     } catch { toast.error('Ошибка') }
   }
 
   async function delSvc(id) { await ownerApi.deleteService(id); load() }
-
-  const Field = ({ placeholder, val, set, type='text', half }) => (
-    <input type={type} placeholder={placeholder} value={val}
-      onChange={(e) => set(e.target.value)}
-      autoCapitalize="none"
-      className={`input-field${half ? ' text-[14px] py-3' : ''}`} />
-  )
 
   return (
     <div className="min-h-screen pb-28" style={{ background: '#09090b' }}>
@@ -73,18 +88,44 @@ export default function OwnerBarbers() {
           <div className="card space-y-3 asi">
             <p className="text-[15px] font-bold text-white">Новый барбер</p>
             <div className="grid grid-cols-2 gap-2">
-              <Field placeholder="Имя" val={form.first_name} set={(v) => setForm({...form, first_name:v})} half />
-              <Field placeholder="Фамилия" val={form.last_name} set={(v) => setForm({...form, last_name:v})} half />
+              <Field
+                placeholder="Имя"
+                value={form.first_name}
+                onChange={(e) => setForm(f => ({ ...f, first_name: e.target.value }))}
+              />
+              <Field
+                placeholder="Фамилия"
+                value={form.last_name}
+                onChange={(e) => setForm(f => ({ ...f, last_name: e.target.value }))}
+              />
             </div>
-            <Field placeholder="Телефон" val={form.phone} set={(v) => setForm({...form, phone:v})} />
-            <select value={form.branch} onChange={(e) => setForm({...form, branch:e.target.value})}
-              className="input-field" style={{ color: form.branch ? '#f8fafc' : 'rgba(255,255,255,0.2)' }}>
+            <Field
+              placeholder="Телефон"
+              value={form.phone}
+              onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))}
+            />
+            <select
+              value={form.branch}
+              onChange={(e) => setForm(f => ({ ...f, branch: e.target.value }))}
+              className="input-field"
+              style={{ color: form.branch ? '#f8fafc' : 'rgba(255,255,255,0.2)' }}>
               <option value="">Выберите филиал</option>
-              {branches.map((b) => <option key={b.id} value={b.id} style={{color:'#000'}}>{b.name}</option>)}
+              {branches.map((b) => (
+                <option key={b.id} value={b.id} style={{ color: '#000' }}>{b.name}</option>
+              ))}
             </select>
             <div className="grid grid-cols-2 gap-2">
-              <Field placeholder="Логин" val={form.username} set={(v) => setForm({...form, username:v})} half />
-              <Field placeholder="Пароль" type="password" val={form.password} set={(v) => setForm({...form, password:v})} half />
+              <Field
+                placeholder="Логин"
+                value={form.username}
+                onChange={(e) => setForm(f => ({ ...f, username: e.target.value }))}
+              />
+              <Field
+                placeholder="Пароль"
+                type="password"
+                value={form.password}
+                onChange={(e) => setForm(f => ({ ...f, password: e.target.value }))}
+              />
             </div>
             <button onClick={create} disabled={loading} className="btn-primary">
               {loading ? 'Создаём...' : 'Создать'}
@@ -107,7 +148,7 @@ export default function OwnerBarbers() {
         )}
 
         {barbers.map((barber, idx) => (
-          <div key={barber.id} className="card afu" style={{ animationDelay: `${idx * 0.06}s`, opacity: 0 }}>
+          <div key={barber.id} className="card afu" style={{ animationDelay: `${idx * 0.06}s` }}>
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl flex items-center justify-center font-black text-[16px] flex-shrink-0"
                 style={{ background: '#1a1a1f', color: 'rgba(255,255,255,0.6)' }}>
@@ -121,7 +162,7 @@ export default function OwnerBarbers() {
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button onClick={() => setExpanded(expanded === barber.id ? null : barber.id)}
-                  className="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
+                  className="w-8 h-8 rounded-xl flex items-center justify-center"
                   style={{ background: '#1a1a1f' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                     stroke="rgba(255,255,255,0.3)" strokeWidth="2"
@@ -141,7 +182,7 @@ export default function OwnerBarbers() {
             </div>
 
             {expanded === barber.id && (
-              <div className="mt-4 pt-4 afu" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                 <p className="text-[11px] font-semibold uppercase tracking-widest mb-3"
                   style={{ color: 'rgba(255,255,255,0.2)' }}>Услуги</p>
 
@@ -155,8 +196,7 @@ export default function OwnerBarbers() {
                       <span className="text-[13px] font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.name}</span>
                       <div className="flex items-center gap-3">
                         <span className="text-[13px] font-semibold text-white">{Number(s.price).toLocaleString()} сом</span>
-                        <button onClick={() => delSvc(s.id)} style={{ color: 'rgba(255,255,255,0.15)' }}
-                          className="transition-colors hover:text-red-400">
+                        <button onClick={() => delSvc(s.id)} style={{ color: 'rgba(255,255,255,0.15)' }}>
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                           </svg>
@@ -169,12 +209,21 @@ export default function OwnerBarbers() {
                 {svcForm === barber.id ? (
                   <div className="space-y-2 asi">
                     <div className="grid grid-cols-2 gap-2">
-                      <input placeholder="Название" value={svc.name}
-                        onChange={(e) => setSvc({...svc, name:e.target.value})}
-                        className="input-field text-[13px] py-3" />
-                      <input type="number" placeholder="Цена" value={svc.price}
-                        onChange={(e) => setSvc({...svc, price:e.target.value})}
-                        className="input-field text-[13px] py-3" />
+                      <input
+                        placeholder="Название"
+                        value={svc.name}
+                        onChange={(e) => setSvc(s => ({ ...s, name: e.target.value }))}
+                        autoCorrect="off"
+                        spellCheck="false"
+                        className="input-field text-[13px] py-3"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Цена"
+                        value={svc.price}
+                        onChange={(e) => setSvc(s => ({ ...s, price: e.target.value }))}
+                        className="input-field text-[13px] py-3"
+                      />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <button onClick={() => addSvc(barber.id)} className="btn-primary py-3 text-[13px]">Добавить</button>

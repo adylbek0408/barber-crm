@@ -3,11 +3,23 @@ import toast from 'react-hot-toast'
 import { adminApi } from '../../api'
 import useAuthStore from '../../store/authStore'
 
+// Поля формы — определены ВНЕ компонента (иначе клавиатура закрывается на мобиле)
+const FIELDS = [
+  { key: 'name',       placeholder: 'Название барбершопа' },
+  { key: 'owner_name', placeholder: 'Имя владельца' },
+  { key: 'phone',      placeholder: 'Телефон' },
+  { key: 'address',    placeholder: 'Адрес' },
+  { key: 'username',   placeholder: 'Логин для входа' },
+  { key: 'password',   placeholder: 'Пароль', type: 'password' },
+]
+
+const EMPTY = { name: '', owner_name: '', phone: '', address: '', username: '', password: '' }
+
 export default function AdminDashboard() {
   const { logout } = useAuthStore()
   const [shops, setShops] = useState([])
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ name: '', owner_name: '', phone: '', address: '', username: '', password: '' })
+  const [form, setForm] = useState(EMPTY)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => { loadData() }, [])
@@ -23,7 +35,7 @@ export default function AdminDashboard() {
       await adminApi.createBarbershop(form)
       toast.success('Барбершоп создан!')
       setShowForm(false)
-      setForm({ name: '', owner_name: '', phone: '', address: '', username: '', password: '' })
+      setForm(EMPTY)
       loadData()
     } catch {
       toast.error('Ошибка создания')
@@ -57,20 +69,19 @@ export default function AdminDashboard() {
         {showForm && (
           <div className="card space-y-3">
             <h3 className="font-bold">Новый барбершоп</h3>
-            {[
-              { key: 'name', placeholder: 'Название барбершопа' },
-              { key: 'owner_name', placeholder: 'Имя владельца' },
-              { key: 'phone', placeholder: 'Телефон' },
-              { key: 'address', placeholder: 'Адрес' },
-              { key: 'username', placeholder: 'Логин для входа' },
-              { key: 'password', placeholder: 'Пароль', type: 'password' },
-            ].map(({ key, placeholder, type = 'text' }) => (
+            {FIELDS.map(({ key, placeholder, type = 'text' }) => (
               <input
                 key={key}
                 type={type}
                 placeholder={placeholder}
                 value={form[key]}
-                onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                onChange={(e) => {
+                  const val = e.target.value
+                  setForm(f => ({ ...f, [key]: val }))
+                }}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck="false"
                 className="w-full px-4 py-3 bg-primary rounded-xl text-white border border-white/10 focus:outline-none"
               />
             ))}
@@ -91,9 +102,7 @@ export default function AdminDashboard() {
               <button
                 onClick={() => handleToggle(shop.id)}
                 className={`text-xs px-3 py-1 rounded-full font-semibold ${
-                  shop.is_active
-                    ? 'bg-green-500/20 text-green-400'
-                    : 'bg-red-500/20 text-red-400'
+                  shop.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
                 }`}
               >
                 {shop.is_active ? 'Активен' : 'Заблок.'}

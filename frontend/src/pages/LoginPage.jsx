@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { authApi } from '../api'
 import useAuthStore from '../store/authStore'
+import InstallPWA from '../components/InstallPWA'
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')
@@ -100,7 +101,9 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <button onClick={handleLogin} disabled={loading} className="btn-primary mt-5">
+        <InstallPWA className="mt-3" />
+
+        <button onClick={handleLogin} disabled={loading} className="btn-primary mt-3">
           {loading
             ? <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25"/>
