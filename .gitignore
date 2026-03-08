@@ -9,5 +9,9 @@
 Thumbs.db
 desktop.ini
 
-# ── Docker volumes / local data ──
-postgres_data/
+# ── Docker (удалён) ──
+docker-compose.yml
+**/Dockerfile
+
+# ── Deploy секреты ──
+deploy/.env.production

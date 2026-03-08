@@ -1,4 +1,4 @@
-from decouple import config
+from decouple import config, Csv
 from datetime import timedelta
 from pathlib import Path
 
@@ -6,7 +6,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = ['*']
+
+# В .env.production задай: ALLOWED_HOSTS=83.222.10.148,localhost
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
 
 DJANGO_APPS = [
     'jazzmin',
@@ -97,7 +99,13 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS: в продакшене читаем из .env, в dev разрешаем всё
+_cors_origins = config('CORS_ALLOWED_ORIGINS', default='', cast=Csv())
+if _cors_origins:
+    CORS_ALLOWED_ORIGINS = _cors_origins
+    CORS_ALLOW_ALL_ORIGINS = False
+else:
+    CORS_ALLOW_ALL_ORIGINS = True
 
 LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'Asia/Bishkek'
@@ -106,6 +114,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -118,20 +129,15 @@ JAZZMIN_SETTINGS = {
     "site_brand": "✂️ BarberCRM",
     "welcome_sign": "Добро пожаловать в BarberCRM",
     "copyright": "iAnt Development Studio",
-
-    # ✅ ПРАВИЛЬНЫЙ формат: "app_label.ModelName" — только 2 части!
     "search_model": ["barbershops.Barbershop", "barbers.Barber"],
-
     "topmenu_links": [
         {"name": "Главная", "url": "admin:index"},
         {"name": "Барбершопы", "url": "admin:barbershops_barbershop_changelist"},
         {"name": "Барберы", "url": "admin:barbers_barber_changelist"},
         {"name": "Записи", "url": "admin:appointments_appointment_changelist"},
     ],
-
     "show_sidebar": True,
     "navigation_expanded": True,
-
     "icons": {
         "auth": "fas fa-users-cog",
         "accounts.User": "fas fa-user",
@@ -142,10 +148,8 @@ JAZZMIN_SETTINGS = {
         "barbers.Service": "fas fa-list",
         "appointments.Appointment": "fas fa-calendar-check",
     },
-
     "default_icon_parents": "fas fa-chevron-circle-right",
     "default_icon_children": "fas fa-circle",
-
     "related_modal_active": True,
     "use_google_fonts_cdn": True,
     "show_ui_builder": False,
