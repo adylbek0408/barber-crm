@@ -1,0 +1,56 @@
+import { Routes, Route, Navigate } from 'react-router-dom'
+import useAuthStore from './store/authStore'
+
+// Pages
+import LoginPage from './pages/LoginPage'
+import BarberHome from './pages/barber/BarberHome'
+import OwnerDashboard from './pages/owner/OwnerDashboard'
+import OwnerBarbers from './pages/owner/OwnerBarbers'
+import OwnerBranches from './pages/owner/OwnerBranches'
+import AdminDashboard from './pages/admin/AdminDashboard'
+
+function PrivateRoute({ children, role }) {
+  const { user, token } = useAuthStore()
+  if (!token) return <Navigate to="/login" replace />
+  if (role && user?.role !== role) return <Navigate to="/login" replace />
+  return children
+}
+
+export default function App() {
+  const { user } = useAuthStore()
+
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Барбер */}
+      <Route path="/barber" element={
+        <PrivateRoute role="barber"><BarberHome /></PrivateRoute>
+      } />
+
+      {/* Владелец */}
+      <Route path="/owner" element={
+        <PrivateRoute role="owner"><OwnerDashboard /></PrivateRoute>
+      } />
+      <Route path="/owner/barbers" element={
+        <PrivateRoute role="owner"><OwnerBarbers /></PrivateRoute>
+      } />
+      <Route path="/owner/branches" element={
+        <PrivateRoute role="owner"><OwnerBranches /></PrivateRoute>
+      } />
+
+      {/* Платформ-Админ */}
+      <Route path="/admin" element={
+        <PrivateRoute role="platform_admin"><AdminDashboard /></PrivateRoute>
+      } />
+
+      {/* Редирект по роли */}
+      <Route path="/" element={
+        user?.role === 'barber' ? <Navigate to="/barber" /> :
+        user?.role === 'owner' ? <Navigate to="/owner" /> :
+        user?.role === 'platform_admin' ? <Navigate to="/admin" /> :
+        <Navigate to="/login" />
+      } />
+    </Routes>
+  )
+}

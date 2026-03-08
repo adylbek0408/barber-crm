@@ -1,0 +1,36 @@
+# ── Секреты ──
+.env
+.env.*
+!.env.example
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+
+# ── Virtual env ──
+venv/
+.venv/
+env/
+.env/
+
+# ── Django ──
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static/
+
+# ── Pytest / coverage ──
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── Misc ──
+*.egg-info/
+dist/
+build/

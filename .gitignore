@@ -1,0 +1,13 @@
+# ── IDE ──
+.idea/
+.vscode/
+*.suo
+*.user
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Docker volumes / local data ──
+postgres_data/
