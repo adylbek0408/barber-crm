@@ -10,7 +10,8 @@ cd "$PROJECT_DIR"
 
 echo "🔄 Обновляем BarberCRM..."
 
-# Получаем изменения
+# Получаем изменения (сбрасываем локальные изменения на сервере)
+git reset --hard HEAD
 git pull
 
 # Backend

@@ -3,6 +3,7 @@ import toast from 'react-hot-toast'
 import { barberApi } from '../../api'
 import useAuthStore from '../../store/authStore'
 import InstallPWA from '../../components/InstallPWA'
+import ServiceForm from '../../components/ServiceForm'
 
 const S = { SELECT: 'select', PAY: 'pay', DONE: 'done' }
 const TAB = { WORK: 'work', SERVICES: 'services' }
@@ -21,8 +22,6 @@ export default function BarberHome() {
   const [loading, setLoading] = useState(true)
 
   // ── Управление услугами ──
-  const [svcForm, setSvcForm] = useState({ name: '', price: '' })
-  const [svcLoading, setSvcLoading] = useState(false)
   const [showSvcForm, setShowSvcForm] = useState(false)
 
   useEffect(() => { loadServices() }, [])
@@ -34,23 +33,6 @@ export default function BarberHome() {
       setServices(r.data)
     } catch { toast.error('Ошибка загрузки') }
     finally { setLoading(false) }
-  }
-
-  async function handleCreateService() {
-    if (!svcForm.name || !svcForm.price) { toast.error('Заполните все поля'); return }
-    if (isNaN(Number(svcForm.price)) || Number(svcForm.price) <= 0) {
-      toast.error('Введите корректную цену'); return
-    }
-    setSvcLoading(true)
-    try {
-      await barberApi.createService({ name: svcForm.name, price: svcForm.price })
-      toast.success('Услуга добавлена!')
-      setSvcForm({ name: '', price: '' })
-      setShowSvcForm(false)
-      loadServices()
-    } catch (e) {
-      toast.error(e.response?.data?.detail || 'Ошибка')
-    } finally { setSvcLoading(false) }
   }
 
   async function handleDeleteService(id) {
@@ -103,7 +85,7 @@ export default function BarberHome() {
         </div>
       </header>
 
-      {/* PWA install — показывается только если не установлено */}
+      {/* PWA install */}
       <div className="px-4 pb-1">
         <InstallPWA />
       </div>
@@ -361,27 +343,9 @@ export default function BarberHome() {
             )}
           </button>
 
-          {/* Форма добавления */}
+          {/* Форма добавления — вынесена в отдельный компонент, клавиатура не закрывается */}
           {showSvcForm && (
-            <div className="glass-card space-y-3 asi mb-4">
-              <p className="text-white font-bold">Новая услуга</p>
-              <input
-                placeholder="Название (напр. Стрижка)"
-                value={svcForm.name}
-                onChange={(e) => setSvcForm({ ...svcForm, name: e.target.value })}
-                className="input-field"
-              />
-              <input
-                placeholder="Цена (сом)"
-                type="number"
-                value={svcForm.price}
-                onChange={(e) => setSvcForm({ ...svcForm, price: e.target.value })}
-                className="input-field"
-              />
-              <button onClick={handleCreateService} disabled={svcLoading} className="btn-primary">
-                {svcLoading ? 'Сохраняем...' : 'Сохранить'}
-              </button>
-            </div>
+            <ServiceForm onCreated={() => { setShowSvcForm(false); loadServices() }} />
           )}
 
           {/* Список услуг */}
