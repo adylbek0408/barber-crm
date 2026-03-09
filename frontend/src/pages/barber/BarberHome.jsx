@@ -255,16 +255,23 @@ export default function BarberHome() {
 
               <div className="space-y-2 flex-1">
                 {[
-                  { id: 'cash', icon: '💵', label: 'Наличные', sub: 'Оплата на месте' },
-                  { id: 'online', icon: '📲', label: 'Онлайн', sub: 'Элсом, Мбанк, QR' },
+                  {
+                    id: 'cash', label: 'Наличные', sub: 'Оплата на месте',
+                    icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 12h.01M18 12h.01"/></svg>
+                  },
+                  {
+                    id: 'online', label: 'Онлайн', sub: 'Элсом, Мбанк, QR',
+                    icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                  },
                 ].map((p) => {
                   const on = pay === p.id
                   return (
                     <button key={p.id} onClick={() => setPay(p.id)}
                       className="payment-item"
                       style={on ? { background: '#16161c', border: '1px solid rgba(255,255,255,0.18)' } : {}}>
-                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-                        style={{ background: on ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)' }}>
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+                        style={{ background: on ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+                                 color: on ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.3)' }}>
                         {p.icon}
                       </div>
                       <div className="flex-1">

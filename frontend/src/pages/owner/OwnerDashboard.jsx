@@ -153,12 +153,18 @@ export default function OwnerDashboard() {
                 style={{ color: 'rgba(255,255,255,0.25)' }}>Оплаты</p>
               <div className="space-y-4">
                 {[
-                  { label: 'Наличные', icon: '💵', val: Number(cash?.total || 0), cnt: cash?.count || 0, pct: cashPct },
-                  { label: 'Онлайн',   icon: '📲', val: Number(online?.total || 0), cnt: online?.count || 0, pct: 100 - cashPct },
+                  {
+                    label: 'Наличные', val: Number(cash?.total || 0), cnt: cash?.count || 0, pct: cashPct,
+                    icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 12h.01M18 12h.01"/></svg>
+                  },
+                  {
+                    label: 'Онлайн', val: Number(online?.total || 0), cnt: online?.count || 0, pct: 100 - cashPct,
+                    icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                  },
                 ].map((row) => (
                   <div key={row.label}>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[14px] font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                      <span className="flex items-center gap-2 text-[14px] font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
                         {row.icon} {row.label}
                       </span>
                       <div className="flex items-center gap-3">

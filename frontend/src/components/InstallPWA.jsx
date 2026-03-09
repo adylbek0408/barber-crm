@@ -1,191 +1,139 @@
 import { useState, useEffect } from 'react'
 
-function getOS() {
-  const ua = navigator.userAgent
-  if (/iphone|ipad|ipod/i.test(ua)) return 'ios'
-  if (/android/i.test(ua)) return 'android'
-  return 'desktop'
-}
+function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent) }
+function isSafari() { return /^((?!chrome|android).)*safari/i.test(navigator.userAgent) }
 
-function getBrowser() {
-  const ua = navigator.userAgent
-  if (/samsungbrowser/i.test(ua)) return 'samsung'
-  if (/edg\//i.test(ua)) return 'edge'
-  if (/chrome|crios/i.test(ua)) return 'chrome'
-  if (/firefox|fxios/i.test(ua)) return 'firefox'
-  if (/safari/i.test(ua)) return 'safari'
-  return 'other'
-}
+const IcoDownload = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/>
+    <line x1="12" y1="15" x2="12" y2="3"/>
+  </svg>
+)
 
-const GUIDES = {
-  ios: [
-    { icon: '⬆️', text: 'Нажми кнопку «Поделиться» (квадрат со стрелкой) внизу Safari' },
-    { icon: '📜', text: 'Прокрути список иконок действий вниз' },
-    { icon: '📲', text: 'Нажми «На экран "Домой"»' },
-    { icon: '✅', text: 'Нажми «Добавить» в правом верхнем углу' },
-  ],
-  android_chrome: [
-    { icon: '⋮', text: 'Нажми «⋮» (три точки) в правом верхнем углу Chrome' },
-    { icon: '📲', text: 'Выбери «Добавить на главный экран»' },
-    { icon: '✅', text: 'Нажми «Добавить»' },
-  ],
-  android_samsung: [
-    { icon: '⋮', text: 'Нажми «⋮» в адресной строке' },
-    { icon: '📲', text: 'Выбери «Добавить страницу на»' },
-    { icon: '🏠', text: 'Выбери «Главный экран»' },
-  ],
-  desktop_chrome: [
-    { icon: '⋮', text: 'Нажми «⋮» в правом верхнем углу браузера' },
-    { icon: '💾', text: 'Выбери «Сохранить и поделиться» → «Создать ярлык»' },
-    { icon: '✅', text: 'Нажми «Создать»' },
-  ],
-  desktop_edge: [
-    { icon: '…', text: 'Нажми «…» в правом верхнем углу Edge' },
-    { icon: '📲', text: 'Выбери «Приложения» → «Установить этот сайт как приложение»' },
-    { icon: '✅', text: 'Нажми «Установить»' },
-  ],
-  default: [
-    { icon: '🌐', text: 'Открой меню браузера (три точки / настройки)' },
-    { icon: '📲', text: 'Найди «Добавить на главный экран» или «Установить»' },
-    { icon: '✅', text: 'Подтверди установку' },
-  ],
-}
+const IcoShare = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f8fafc"
+    strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+    <polyline points="16 6 12 2 8 6"/>
+    <line x1="12" y1="2" x2="12" y2="15"/>
+  </svg>
+)
 
-function getGuide() {
-  const os = getOS()
-  const br = getBrowser()
-  if (os === 'ios') return { title: 'Установить на iPhone/iPad', steps: GUIDES.ios }
-  if (os === 'android' && br === 'samsung') return { title: 'Установить на Android', steps: GUIDES.android_samsung }
-  if (os === 'android') return { title: 'Установить на Android', steps: GUIDES.android_chrome }
-  if (br === 'edge') return { title: 'Установить приложение', steps: GUIDES.desktop_edge }
-  if (br === 'chrome') return { title: 'Установить приложение', steps: GUIDES.desktop_chrome }
-  return { title: 'Установить приложение', steps: GUIDES.default }
-}
+const IcoPlus = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f8fafc"
+    strokeWidth="1.8" strokeLinecap="round">
+    <rect x="3" y="3" width="18" height="18" rx="4"/>
+    <line x1="12" y1="8" x2="12" y2="16"/>
+    <line x1="8" y1="12" x2="16" y2="12"/>
+  </svg>
+)
 
-// Сессия — показываем каждый раз при входе, не запоминаем навсегда
-// Пользователь может скрыть только кнопкой "Больше не показывать"
-const STORAGE_KEY = 'pwa-install-hidden-v2'
+const IcoCheck = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f8fafc"
+    strokeWidth="1.8" strokeLinecap="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+)
+
+const IOS_STEPS = [
+  { icon: <IcoShare />, title: 'Нажми «Поделиться»', sub: 'Кнопка внизу Safari — квадрат со стрелкой вверх' },
+  { icon: <IcoPlus />, title: 'На экран «Домой»', sub: 'Прокрути список действий вниз и найди этот пункт' },
+  { icon: <IcoCheck />, title: 'Нажми «Добавить»', sub: 'Кнопка в правом верхнем углу диалога' },
+]
 
 export default function InstallPWA({ className = '' }) {
-  const [isStandalone, setIsStandalone] = useState(false)
-  const [prompt, setPrompt] = useState(null)
-  const [showGuide, setShowGuide] = useState(false)
-  const [hidden, setHidden] = useState(false)
+  const [standalone, setStandalone] = useState(false)
+  const [prompt, setPrompt]         = useState(null)
+  const [showSheet, setShowSheet]   = useState(false)
 
   useEffect(() => {
-    // Уже запущено как PWA?
-    const standalone =
+    if (
       window.matchMedia('(display-mode: standalone)').matches ||
       window.navigator.standalone === true
-    if (standalone) { setIsStandalone(true); return }
+    ) { setStandalone(true); return }
 
-    // Скрыт навсегда?
-    if (localStorage.getItem(STORAGE_KEY) === '1') {
-      setHidden(true)
-    }
-
-    // Нативный prompt (Chrome/Edge по HTTPS)
-    const handler = (e) => { e.preventDefault(); setPrompt(e) }
-    window.addEventListener('beforeinstallprompt', handler)
-    window.addEventListener('appinstalled', () => setIsStandalone(true))
-    return () => window.removeEventListener('beforeinstallprompt', handler)
+    const onPrompt = e => { e.preventDefault(); setPrompt(e) }
+    window.addEventListener('beforeinstallprompt', onPrompt)
+    window.addEventListener('appinstalled', () => { setStandalone(true); setPrompt(null) })
+    return () => window.removeEventListener('beforeinstallprompt', onPrompt)
   }, [])
 
-  function hideForever() {
-    localStorage.setItem(STORAGE_KEY, '1')
-    setHidden(true)
+  async function install() {
+    if (prompt) {
+      prompt.prompt()
+      const { outcome } = await prompt.userChoice
+      if (outcome === 'accepted') setStandalone(true)
+    } else if (isIOS() && isSafari()) {
+      setShowSheet(true)
+    }
   }
 
-  function hideSess() {
-    // Скрыть только на эту сессию (не в localStorage)
-    setHidden(true)
-  }
-
-  async function handleNativeInstall() {
-    if (!prompt) return
-    prompt.prompt()
-    const { outcome } = await prompt.userChoice
-    if (outcome === 'accepted') setIsStandalone(true)
-  }
-
-  if (isStandalone || hidden) return null
-
-  const { title, steps } = getGuide()
+  // Не показываем кнопку если: уже установлено, или нет ни промпта ни iOS Safari
+  const noAction = !prompt && !(isIOS() && isSafari())
+  if (standalone || noAction) return null
 
   return (
     <>
-      {/* Баннер */}
+      {/* Кнопка установки */}
       <button
-        onClick={() => prompt ? handleNativeInstall() : setShowGuide(true)}
-        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl transition-all active:scale-95 ${className}`}
-        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
-      >
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ background: '#1a1a1f', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
-            stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-        </div>
-        <div className="flex-1 text-left">
-          <p className="text-[13px] font-semibold text-white leading-tight">Установить приложение</p>
-          <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.3)' }}>Добавить на главный экран</p>
-        </div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-          stroke="rgba(255,255,255,0.2)" strokeWidth="2" strokeLinecap="round">
-          <polyline points="9 18 15 12 9 6"/>
-        </svg>
-        {/* Закрыть на сессию */}
-        <div
-          role="button" tabIndex={0}
-          onClick={e => { e.stopPropagation(); hideSess() }}
-          onKeyDown={e => e.key === 'Enter' && (e.stopPropagation(), hideSess())}
-          className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{ background: 'rgba(255,255,255,0.08)' }}>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
-            stroke="rgba(255,255,255,0.4)" strokeWidth="2.5">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </div>
+        onClick={install}
+        className={`btn-primary ${className}`}
+        style={{ gap: 8 }}>
+        <IcoDownload />
+        Установить приложение
       </button>
 
-      {/* Модальная инструкция */}
-      {showGuide && (
+      {/* iOS Bottom Sheet */}
+      {showSheet && (
         <div
           className="fixed inset-0 z-[999] flex items-end"
-          style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}
-          onClick={() => setShowGuide(false)}>
+          style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)' }}
+          onClick={() => setShowSheet(false)}>
           <div
-            className="w-full rounded-t-3xl p-6"
-            style={{ background: '#1a1a1f', border: '1px solid rgba(255,255,255,0.1)' }}
+            className="w-full rounded-t-3xl pb-8"
+            style={{ background: '#141417', border: '1px solid rgba(255,255,255,0.08)' }}
             onClick={e => e.stopPropagation()}>
-            <div className="w-10 h-1 rounded-full mx-auto mb-6"
-              style={{ background: 'rgba(255,255,255,0.15)' }} />
-            <h3 className="text-white font-bold text-[18px] mb-6 text-center">{title}</h3>
-            <div className="space-y-4 mb-6">
-              {steps.map(({ icon, text }, i) => (
-                <div key={i} className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-[20px] flex-shrink-0"
-                    style={{ background: '#111113', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    {icon}
+
+            <div className="flex justify-center pt-3 pb-5">
+              <div className="w-9 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.12)' }} />
+            </div>
+
+            <p className="text-white font-bold text-[17px] text-center mb-6 px-6">
+              Добавить на главный экран
+            </p>
+
+            <div className="px-5 space-y-3 mb-7">
+              {IOS_STEPS.map(({ icon, title, sub }, i) => (
+                <div key={i} className="flex items-center gap-4 px-4 py-3 rounded-2xl"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div className="relative flex-shrink-0">
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center"
+                      style={{ background: '#1e1e24' }}>
+                      {icon}
+                    </div>
+                    <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center"
+                      style={{ background: '#f8fafc' }}>
+                      <span className="text-[9px] font-black text-black">{i + 1}</span>
+                    </div>
                   </div>
-                  <div className="flex-1 pt-1">
-                    <span className="text-white font-semibold text-[13px]">Шаг {i + 1}: </span>
-                    <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{text}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-semibold text-white leading-tight">{title}</p>
+                    <p className="text-[11px] mt-[2px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{sub}</p>
                   </div>
                 </div>
               ))}
             </div>
-            <button onClick={() => setShowGuide(false)} className="btn-primary">Понял, закрыть</button>
-            <button
-              onClick={() => { setShowGuide(false); hideForever() }}
-              className="w-full mt-3 py-3 text-[13px] text-center"
-              style={{ color: 'rgba(255,255,255,0.25)' }}>
-              Больше не показывать
-            </button>
+
+            <div className="px-5">
+              <button
+                onClick={() => setShowSheet(false)}
+                className="w-full py-3 rounded-2xl text-[14px] font-bold"
+                style={{ background: '#f8fafc', color: '#09090b' }}>
+                Понял
+              </button>
+            </div>
           </div>
         </div>
       )}
