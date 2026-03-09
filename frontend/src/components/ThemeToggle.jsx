@@ -42,12 +42,12 @@ export default function ThemeToggle() {
   }
 
   const icon = auto ? <IcoAuto /> : theme === 'light' ? <IcoSun /> : <IcoMoon />
-  const label = auto ? 'авто' : theme === 'light' ? 'день' : 'ночь'
+  const label = auto ? 'Авто' : theme === 'light' ? 'День' : 'Ночь'
 
   return (
     <button
       onClick={toggle}
-      className="flex items-center gap-[6px] px-3 h-9 rounded-xl transition-all active:scale-95"
+      className="flex items-center gap-[6px] px-3 h-9 rounded-xl transition-all active:scale-95 touch-target min-w-0"
       style={{
         background: 'var(--bg-el)',
         border: '1px solid var(--bd)',
@@ -55,7 +55,8 @@ export default function ThemeToggle() {
         fontSize: 11,
         fontWeight: 600,
       }}
-      title="Сменить тему">
+      title={auto ? 'Авто (по времени суток)' : theme === 'light' ? 'Дневной режим' : 'Ночной режим'}
+      aria-label={label}>
       {icon}
       {label}
     </button>

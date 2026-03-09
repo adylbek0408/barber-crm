@@ -72,17 +72,21 @@ export default function OwnerDashboard() {
   const [yr, mo] = month.split('-')
   const monthLabel = `${MONTHS[parseInt(mo) - 1]} ${yr}`
 
+  const root = typeof document !== 'undefined' ? getComputedStyle(document.documentElement) : null
+  const chartBar = root?.getPropertyValue('--chart-bar')?.trim() || 'rgba(255,255,255,0.15)'
+  const chartBarActive = root?.getPropertyValue('--chart-bar-active')?.trim() || 'rgba(255,255,255,0.7)'
+
   return (
-    <div className="page min-h-screen pb-28">
+    <div className="page min-h-screen pb-nav page-content">
 
       {/* Шапка */}
-      <header className="px-5 pb-4 page-header">
+      <header className="px-4 sm:px-5 pb-4 page-header">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-[12px] font-medium mb-[2px]" style={{ color: 'var(--tx-4)' }}>
               Аналитика
             </p>
-            <h1 className="text-[20px] font-bold leading-tight" style={{ color: 'var(--tx)' }}>
+            <h1 className="text-[22px] font-bold leading-tight" style={{ color: 'var(--tx)' }}>
               {user?.full_name || user?.username}
             </h1>
           </div>
@@ -126,12 +130,12 @@ export default function OwnerDashboard() {
         </label>
       </header>
 
-      <div className="px-4 space-y-3">
+      <div className="px-4 sm:px-5 space-y-3">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24">
             <div className="w-8 h-8 rounded-full border-2 animate-spin mb-3"
-              style={{ borderColor: 'rgba(255,255,255,0.08)', borderTopColor: 'rgba(255,255,255,0.5)' }} />
-            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.2)' }}>Загрузка...</p>
+              style={{ borderColor: 'var(--bd-2)', borderTopColor: 'var(--tx-3)' }} />
+            <p className="text-sm" style={{ color: 'var(--tx-4)' }}>Загрузка...</p>
           </div>
         ) : (
           <>
@@ -173,12 +177,12 @@ export default function OwnerDashboard() {
                       </span>
                       <div className="flex items-center gap-3">
                         <span className="text-[12px]" style={{ color: 'var(--tx-5)' }}>{row.cnt} шт</span>
-                        <span className="text-[14px] font-semibold text-white">{row.val.toLocaleString()} сом</span>
+                        <span className="text-[14px] font-semibold" style={{ color: 'var(--tx)' }}>{row.val.toLocaleString()} сом</span>
                       </div>
                     </div>
-                    <div className="h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                      <div className="h-full rounded-full transition-all duration-700"
-                        style={{ width: `${row.pct}%`, background: 'rgba(255,255,255,0.35)' }} />
+                    <div className="h-[3px] rounded-full overflow-hidden progress-bar-bg">
+                      <div className="h-full rounded-full transition-all duration-700 progress-bar-fill"
+                        style={{ width: `${row.pct}%` }} />
                     </div>
                   </div>
                 ))}
@@ -197,8 +201,7 @@ export default function OwnerDashboard() {
                     <Tooltip content={<Tip />} cursor={{ fill: 'rgba(255,255,255,0.03)', radius: 4 }} />
                     <Bar dataKey="v" radius={[4, 4, 1, 1]}>
                       {byDay.map((_, i) => (
-                        <Cell key={i}
-                          fill={i === byDay.length - 1 ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.15)'} />
+                        <Cell key={i} fill={i === byDay.length - 1 ? chartBarActive : chartBar} />
                       ))}
                     </Bar>
                   </BarChart>

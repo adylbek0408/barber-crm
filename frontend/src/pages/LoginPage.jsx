@@ -32,8 +32,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-[#09090b] px-6"
-      style={{ paddingTop: 'calc(env(safe-area-inset-top) + 48px)', paddingBottom: 'calc(env(safe-area-inset-bottom) + 32px)' }}>
+    <div className="min-h-screen flex flex-col justify-between px-4 sm:px-6"
+      style={{
+        background: 'var(--bg)',
+        paddingTop: 'calc(env(safe-area-inset-top) + 48px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom) + 32px)',
+      }}>
 
       {/* Центр */}
       <div className="afu">
@@ -57,7 +61,7 @@ export default function LoginPage() {
         {/* Ошибка */}
         {err && (
           <div className="mb-4 px-4 py-3 rounded-xl text-sm asi"
-            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.18)', color: '#fca5a5' }}>
+            style={{ background: 'var(--danger-bg)', border: '1px solid var(--danger-border)', color: 'var(--danger-tx)' }}>
             {err}
           </div>
         )}
@@ -76,7 +80,7 @@ export default function LoginPage() {
           </div>
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-widest mb-2"
-              style={{ color: 'rgba(255,255,255,0.25)' }}>Пароль</p>
+              style={{ color: 'var(--tx-4)' }}>Пароль</p>
             <div className="relative">
               <input type={showPass ? 'text' : 'password'} value={password}
                 onChange={(e) => { setPassword(e.target.value); setErr('') }}

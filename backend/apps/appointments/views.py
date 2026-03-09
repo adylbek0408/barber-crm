@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from apps.accounts.permissions import IsBarber, IsOwnerOrAdmin
+from apps.accounts.permissions import IsBarber, IsOwner
 from .models import Appointment
 from .serializers import AppointmentSerializer, CreateAppointmentSerializer
 
@@ -31,9 +31,9 @@ class BarberAppointmentViewSet(viewsets.ModelViewSet):
 
 
 class OwnerAppointmentViewSet(viewsets.ReadOnlyModelViewSet):
-    """Все записи барбершопа — для владельца"""
+    """Все записи барбершопа — только для владельца"""
     serializer_class = AppointmentSerializer
-    permission_classes = [IsOwnerOrAdmin]
+    permission_classes = [IsOwner]
 
     def get_queryset(self):
         qs = Appointment.objects.filter(

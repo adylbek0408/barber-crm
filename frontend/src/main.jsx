@@ -20,8 +20,8 @@ registerSW({
               window.location.reload()
             }}
             style={{
-              background: '#f8fafc',
-              color: '#09090b',
+              background: 'var(--btn-bg)',
+              color: 'var(--btn-tx)',
               border: 'none',
               borderRadius: 8,
               padding: '6px 12px',
@@ -38,9 +38,9 @@ registerSW({
       {
         duration: Infinity,
         style: {
-          background: '#1a1a1f',
-          color: '#fff',
-          border: '1px solid rgba(255,255,255,0.1)',
+          background: 'var(--bg-el)',
+          color: 'var(--tx)',
+          border: '1px solid var(--bd-2)',
           borderRadius: 12,
         },
       }
@@ -50,10 +50,10 @@ registerSW({
     toast('Готово к работе офлайн', {
       duration: 3000,
       style: {
-        background: '#1a1a1f',
-        color: '#fff',
+        background: 'var(--bg-el)',
+        color: 'var(--tx)',
         borderRadius: 12,
-        border: '1px solid rgba(255,255,255,0.08)',
+        border: '1px solid var(--bd-2)',
       },
     })
   },
@@ -67,10 +67,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         position="top-center"
         toastOptions={{
           style: {
-            background: '#1a1a1f',
-            color: '#f1f5f9',
+            background: 'var(--bg-el)',
+            color: 'var(--tx)',
             borderRadius: '12px',
-            border: '1px solid rgba(255,255,255,0.08)',
+            border: '1px solid var(--bd-2)',
             fontSize: '14px',
           },
         }}

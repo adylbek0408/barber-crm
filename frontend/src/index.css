@@ -2,91 +2,107 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
 /* ════════════════════════════════════════
    ТЕМЫ — CSS ПЕРЕМЕННЫЕ
    ════════════════════════════════════════ */
 :root {
-  /* Фоны */
+  /* Тёмная тема (ночь) — значения по умолчанию */
   --bg:       #09090b;
   --bg-card:  #111113;
   --bg-el:    #1a1a1f;
   --bg-deep:  #0f0f12;
   --bg-sheet: #141417;
-
-  /* Границы */
   --bd:   rgba(255,255,255,0.06);
   --bd-2: rgba(255,255,255,0.1);
   --bd-3: rgba(255,255,255,0.14);
-
-  /* Текст */
   --tx:   #f8fafc;
   --tx-2: rgba(255,255,255,0.65);
   --tx-3: rgba(255,255,255,0.38);
   --tx-4: rgba(255,255,255,0.26);
   --tx-5: rgba(255,255,255,0.18);
-
-  /* Иконки */
   --ic:   rgba(255,255,255,0.28);
   --ic-2: rgba(255,255,255,0.55);
-
-  /* Разделитель */
   --sep-c: rgba(255,255,255,0.05);
-
-  /* Навигация */
   --nav-bg: rgba(9,9,11,0.96);
-
-  /* Основная кнопка */
   --btn-bg: #f8fafc;
   --btn-tx: #09090b;
-
-  /* Оверлей */
   --overlay: rgba(0,0,0,0.75);
-
-  /* Логотип */
   --logo-bg: linear-gradient(150deg, #222228, #17171d);
+  --chart-bar: rgba(255,255,255,0.15);
+  --chart-bar-active: rgba(255,255,255,0.7);
+  /* Опасность / успех */
+  --danger-bg: rgba(239,68,68,0.12);
+  --danger-bg-subtle: rgba(239,68,68,0.08);
+  --danger-border: rgba(239,68,68,0.25);
+  --danger-border-subtle: rgba(239,68,68,0.15);
+  --danger-tx: #dc2626;
+  --danger-ic: #f87171;
+  --success-bg: rgba(34,197,94,0.08);
+  --success-border: rgba(34,197,94,0.15);
+  --success-ic: #4ade80;
+}
+
+[data-theme="dark"] {
+  --bg:       #09090b;
+  --bg-card:  #111113;
+  --bg-el:    #1a1a1f;
+  --bg-deep:  #0f0f12;
+  --bg-sheet: #141417;
+  --bd:   rgba(255,255,255,0.06);
+  --bd-2: rgba(255,255,255,0.1);
+  --bd-3: rgba(255,255,255,0.14);
+  --tx:   #f8fafc;
+  --tx-2: rgba(255,255,255,0.65);
+  --tx-3: rgba(255,255,255,0.38);
+  --tx-4: rgba(255,255,255,0.26);
+  --tx-5: rgba(255,255,255,0.18);
+  --ic:   rgba(255,255,255,0.28);
+  --ic-2: rgba(255,255,255,0.55);
+  --sep-c: rgba(255,255,255,0.05);
+  --nav-bg: rgba(9,9,11,0.96);
+  --btn-bg: #f8fafc;
+  --btn-tx: #09090b;
+  --overlay: rgba(0,0,0,0.75);
+  --logo-bg: linear-gradient(150deg, #222228, #17171d);
+  --chart-bar: rgba(255,255,255,0.15);
+  --chart-bar-active: rgba(255,255,255,0.7);
+  --danger-ic: #f87171;
+  --success-ic: #4ade80;
 }
 
 [data-theme="light"] {
-  /* Фоны */
   --bg:       #f2f2f7;
   --bg-card:  #ffffff;
   --bg-el:    #e8e8ed;
   --bg-deep:  #ebebef;
   --bg-sheet: #f8f8fb;
-
-  /* Границы */
   --bd:   rgba(0,0,0,0.07);
   --bd-2: rgba(0,0,0,0.11);
   --bd-3: rgba(0,0,0,0.16);
-
-  /* Текст */
   --tx:   #0a0a0b;
   --tx-2: rgba(0,0,0,0.62);
   --tx-3: rgba(0,0,0,0.42);
   --tx-4: rgba(0,0,0,0.3);
   --tx-5: rgba(0,0,0,0.2);
-
-  /* Иконки */
   --ic:   rgba(0,0,0,0.33);
   --ic-2: rgba(0,0,0,0.55);
-
-  /* Разделитель */
   --sep-c: rgba(0,0,0,0.07);
-
-  /* Навигация */
   --nav-bg: rgba(242,242,247,0.96);
-
-  /* Основная кнопка */
   --btn-bg: #0a0a0b;
   --btn-tx: #ffffff;
-
-  /* Оверлей */
   --overlay: rgba(0,0,0,0.45);
-
-  /* Логотип */
   --logo-bg: linear-gradient(150deg, #dddde3, #e8e8ed);
+  --chart-bar: rgba(0,0,0,0.12);
+  --chart-bar-active: rgba(0,0,0,0.5);
+  --danger-bg: rgba(239,68,68,0.1);
+  --danger-bg-subtle: rgba(239,68,68,0.06);
+  --danger-border: rgba(239,68,68,0.22);
+  --danger-border-subtle: rgba(239,68,68,0.12);
+  --danger-tx: #b91c1c;
+  --danger-ic: #dc2626;
+  --success-bg: rgba(34,197,94,0.1);
+  --success-border: rgba(34,197,94,0.2);
+  --success-ic: #16a34a;
 }
 
 /* ════════════════════════════════════════
@@ -149,6 +165,14 @@
   }
   .btn-gold:disabled { opacity: 0.45; }
 
+  .btn-danger {
+    @apply w-full py-3 rounded-2xl font-semibold text-[15px] transition-all active:scale-[0.98];
+    background: var(--danger-bg);
+    color: var(--danger-tx);
+    border: 1px solid var(--danger-border);
+  }
+  .btn-danger:disabled { opacity: 0.5; }
+
   /* ── Карточки ── */
   .card {
     @apply rounded-2xl p-5;
@@ -179,10 +203,10 @@
     border-color: var(--bd-3);
     background: var(--bg-el);
   }
-  /* Цвет опций в select */
+  /* Цвет опций в select — под обе темы */
   select.input-field option {
-    background: #1a1a1f;
-    color: #f8fafc;
+    background: var(--bg-el);
+    color: var(--tx);
   }
 
   /* ── Бейджи ── */
@@ -194,23 +218,21 @@
   }
   .badge-green {
     @apply text-[11px] font-medium px-2 py-[3px] rounded-md;
-    background: rgba(34,197,94,0.12);
-    color: #16a34a;
-    border: 1px solid rgba(34,197,94,0.25);
+    background: var(--success-bg);
+    color: var(--success-ic);
+    border: 1px solid var(--success-border);
   }
   [data-theme="dark"] .badge-green {
-    color: #4ade80;
-    background: rgba(34,197,94,0.1);
     border-color: rgba(34,197,94,0.2);
   }
   .badge-red {
     @apply text-[11px] font-medium px-2 py-[3px] rounded-md;
-    background: rgba(239,68,68,0.1);
-    color: #dc2626;
-    border: 1px solid rgba(239,68,68,0.25);
+    background: var(--danger-bg-subtle);
+    color: var(--danger-ic);
+    border: 1px solid var(--danger-border);
   }
   [data-theme="dark"] .badge-red {
-    color: #f87171;
+    border-color: rgba(239,68,68,0.25);
   }
   .badge-on {
     background: var(--bg-el);
@@ -257,15 +279,22 @@
     box-shadow: 0 12px 40px rgba(0,0,0,0.2);
   }
 
-  /* ── Модальный оверлей ── */
+  /* ── Модальный оверлей (одно определение: мобильная прокрутка + центрирование) ── */
   .modal-overlay {
-    @apply fixed inset-0 z-[999] flex items-center justify-center px-6;
+    @apply fixed inset-0 z-[999] flex px-4;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
     background: var(--overlay);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .modal-card {
-    @apply w-full max-w-xs rounded-3xl p-6;
+    @apply w-full rounded-3xl p-6 my-auto;
+    max-width: min(calc(100vw - 2rem), 22rem);
     background: var(--bg-el);
     border: 1px solid var(--bd-2);
   }
@@ -273,7 +302,9 @@
   /* ── Контейнер страницы ── */
   .page {
     min-height: 100svh;
+    min-height: 100dvh;
     background: var(--bg);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
@@ -304,7 +335,7 @@
 body,
 .card, .glass-card, .card-accent,
 .bottom-nav, .service-item, .payment-item,
-.input-field, .btn-primary, .btn-outline,
+.input-field, .btn-primary, .btn-outline, .btn-danger,
 .logo-box, .modal-card {
   transition:
     background-color 0.3s ease,
@@ -325,3 +356,37 @@ body,
 
 /* Safe area */
 .page-header { padding-top: calc(env(safe-area-inset-top) + 20px); }
+
+/* Отступ снизу для страниц с нижней навигацией */
+.pb-nav { padding-bottom: 7rem; }
+@media (min-width: 768px) { .pb-nav { padding-bottom: 6rem; } }
+
+/* ════════════════════════════════════════
+   МОБИЛЬНАЯ АДАПТАЦИЯ
+   ════════════════════════════════════════ */
+.page-content {
+  width: 100%;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (min-width: 768px) {
+  .page-content { max-width: 520px; }
+}
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+body { overflow-x: hidden; }
+.progress-bar-bg {
+  background: rgba(255,255,255,0.06);
+}
+.progress-bar-fill {
+  background: rgba(255,255,255,0.35);
+}
+[data-theme="light"] .progress-bar-bg {
+  background: rgba(0,0,0,0.08);
+}
+[data-theme="light"] .progress-bar-fill {
+  background: rgba(0,0,0,0.35);
+}

@@ -43,11 +43,17 @@ class CreateBarbershopSerializer(serializers.ModelSerializer):
         password = validated_data.pop('password')
 
         # Создаём пользователя-владельца
+        owner_name = (validated_data.get('owner_name') or '').strip()
+        name_parts = owner_name.split(None, 1) if owner_name else []
+        first_name = name_parts[0] if name_parts else ''
+        last_name = name_parts[1] if len(name_parts) > 1 else ''
+
         user = User.objects.create_user(
             username=username,
             password=password,
             role=User.ROLE_OWNER,
-            first_name=validated_data.get('owner_name', '').split()[0] if validated_data.get('owner_name') else '',
+            first_name=first_name,
+            last_name=last_name,
         )
 
         barbershop = Barbershop.objects.create(owner=user, **validated_data)

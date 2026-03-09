@@ -13,7 +13,7 @@ const IcoDownload = () => (
 )
 
 const IcoShare = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f8fafc"
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
     strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
     <polyline points="16 6 12 2 8 6"/>
@@ -22,7 +22,7 @@ const IcoShare = () => (
 )
 
 const IcoPlus = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f8fafc"
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
     strokeWidth="1.8" strokeLinecap="round">
     <rect x="3" y="3" width="18" height="18" rx="4"/>
     <line x1="12" y1="8" x2="12" y2="16"/>
@@ -31,7 +31,7 @@ const IcoPlus = () => (
 )
 
 const IcoCheck = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f8fafc"
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
     strokeWidth="1.8" strokeLinecap="round">
     <polyline points="20 6 9 17 4 12"/>
   </svg>
@@ -93,7 +93,11 @@ export default function InstallPWA({ className = '' }) {
           onClick={() => setShowSheet(false)}>
           <div
             className="w-full rounded-t-3xl pb-8"
-            style={{ background: 'var(--bg-el)', border: '1px solid var(--bd-2)' }}
+            style={{
+              background: 'var(--bg-el)',
+              border: '1px solid var(--bd-2)',
+              paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
+            }}
             onClick={e => e.stopPropagation()}>
 
             <div className="flex justify-center pt-3 pb-5">
@@ -110,7 +114,7 @@ export default function InstallPWA({ className = '' }) {
                   style={{ background: 'var(--bg-card)', border: '1px solid var(--bd)' }}>
                   <div className="relative flex-shrink-0">
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center"
-                      style={{ background: 'var(--bg-deep)' }}>
+                      style={{ background: 'var(--bg-deep)', color: 'var(--btn-tx)' }}>
                       {icon}
                     </div>
                     <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center"
@@ -119,7 +123,7 @@ export default function InstallPWA({ className = '' }) {
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold text-white leading-tight">{title}</p>
+                    <p className="text-[13px] font-semibold leading-tight" style={{ color: 'var(--tx)' }}>{title}</p>
                     <p className="text-[11px] mt-[2px]" style={{ color: 'var(--tx-3)' }}>{sub}</p>
                   </div>
                 </div>

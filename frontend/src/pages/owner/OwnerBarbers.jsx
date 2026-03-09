@@ -2,32 +2,9 @@ import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { ownerApi } from '../../api'
 import BottomNav from '../../components/BottomNav'
+import ConfirmModal from '../../components/ConfirmModal'
 
 const INPUT = 'input-field text-[14px] py-3'
-
-// Кастомный диалог подтверждения
-function ConfirmModal({ text, onConfirm, onCancel, loading }) {
-  return (
-    <div className="modal-overlay">
-      <div className="modal-card">
-        <h3 className="font-bold text-[17px] mb-2 text-center" style={{ color: 'var(--tx)' }}>{text}</h3>
-        <p className="text-center text-[13px] mb-6" style={{ color: 'var(--tx-3)' }}>
-          Это действие нельзя отменить
-        </p>
-        <button onClick={onConfirm} disabled={loading}
-          className="w-full py-3 rounded-2xl font-semibold text-[15px] mb-3"
-          style={{ background: 'rgba(239,68,68,0.12)', color: '#dc2626', border: '1px solid rgba(239,68,68,0.25)' }}>
-          {loading ? 'Удаляем...' : 'Удалить'}
-        </button>
-        <button onClick={onCancel}
-          className="w-full py-3 rounded-2xl font-semibold text-[15px]"
-          style={{ background: 'var(--bg-deep)', color: 'var(--tx-3)' }}>
-          Отмена
-        </button>
-      </div>
-    </div>
-  )
-}
 
 export default function OwnerBarbers() {
   const [barbers, setBarbers] = useState([])
@@ -124,7 +101,7 @@ export default function OwnerBarbers() {
   }
 
   return (
-    <div className="page min-h-screen pb-28">
+      <div className="page min-h-screen pb-nav page-content">
 
       {/* Модал удаления барбера */}
       {deleteBarber && (
@@ -146,14 +123,14 @@ export default function OwnerBarbers() {
         />
       )}
 
-      <header className="px-5 pb-5 page-header">
-        <h1 className="text-[24px] font-black" style={{ color: 'var(--tx)' }}>Барберы</h1>
+      <header className="px-4 sm:px-5 pb-5 page-header">
+        <h1 className="text-[22px] font-black" style={{ color: 'var(--tx)' }}>Барберы</h1>
         <p className="text-[13px] mt-1" style={{ color: 'var(--tx-4)' }}>
           {barbers.length} сотрудников
         </p>
       </header>
 
-      <div className="px-4 space-y-3">
+      <div className="px-4 sm:px-5 space-y-3">
         <button onClick={() => setShowForm(v => !v)}
           className={showForm ? 'btn-outline' : 'btn-primary'}>
           {showForm
@@ -164,7 +141,7 @@ export default function OwnerBarbers() {
 
         {showForm && (
           <div className="card space-y-3">
-            <p className="text-[15px] font-bold text-white">Новый барбер</p>
+            <p className="text-[15px] font-bold" style={{ color: 'var(--tx)' }}>Новый барбер</p>
             <div className="grid grid-cols-2 gap-2">
               <input className={INPUT} placeholder="Имя" value={form.first_name}
                 autoCapitalize="words" autoCorrect="off"
@@ -177,10 +154,10 @@ export default function OwnerBarbers() {
               type="tel" onChange={e => setField('phone', e.target.value)} />
             <select value={form.branch} onChange={e => setField('branch', e.target.value)}
               className="input-field"
-              style={{ color: form.branch ? '#f8fafc' : 'rgba(255,255,255,0.2)' }}>
+              style={{ color: form.branch ? 'var(--tx)' : 'var(--tx-4)' }}>
               <option value="">Выберите филиал</option>
               {branches.map(b => (
-                <option key={b.id} value={b.id} style={{ color: '#000' }}>{b.name}</option>
+                <option key={b.id} value={b.id}>{b.name}</option>
               ))}
             </select>
             <div className="grid grid-cols-2 gap-2">
@@ -200,14 +177,14 @@ export default function OwnerBarbers() {
         {barbers.length === 0 && !showForm && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
-              style={{ background: '#111113', border: '1px solid rgba(255,255,255,0.06)' }}>
+              style={{ background: 'var(--bg-card)', border: '1px solid var(--bd)' }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-                stroke="rgba(255,255,255,0.2)" strokeWidth="1.8" strokeLinecap="round">
+                stroke="var(--ic)" strokeWidth="1.8" strokeLinecap="round">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
               </svg>
             </div>
-            <p style={{ color: 'rgba(255,255,255,0.3)' }} className="font-medium">Барберов пока нет</p>
+            <p className="font-medium" style={{ color: 'var(--tx-3)' }}>Барберов пока нет</p>
           </div>
         )}
 
@@ -236,8 +213,8 @@ export default function OwnerBarbers() {
                 </button>
                 <button onClick={() => setDeleteBarber(barber.id)}
                   className="w-8 h-8 rounded-xl flex items-center justify-center"
-                  style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)' }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2">
+                  style={{ background: 'var(--danger-bg-subtle)', border: '1px solid var(--danger-border-subtle)' }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--danger-ic)" strokeWidth="2">
                     <polyline points="3 6 5 6 21 6"/>
                     <path d="M19 6l-1 14H6L5 6"/>
                   </svg>
@@ -246,7 +223,7 @@ export default function OwnerBarbers() {
             </div>
 
             {expanded === barber.id && (
-              <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--sep-c)' }}>
                 <p className="text-[11px] font-semibold uppercase tracking-widest mb-3"
                   style={{ color: 'var(--tx-5)' }}>Услуги</p>
 
@@ -314,9 +291,9 @@ export default function OwnerBarbers() {
                           <button
                             onClick={() => setDeleteSvc(s.id)}
                             className="w-7 h-7 rounded-lg flex items-center justify-center"
-                            style={{ background: 'rgba(239,68,68,0.08)' }}>
+                            style={{ background: 'var(--danger-bg-subtle)' }}>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                              stroke="#f87171" strokeWidth="2.5">
+                              stroke="var(--danger-ic)" strokeWidth="2.5">
                               <line x1="18" y1="6" x2="6" y2="18"/>
                               <line x1="6" y1="6" x2="18" y2="18"/>
                             </svg>
@@ -348,7 +325,7 @@ export default function OwnerBarbers() {
                 ) : (
                   <button onClick={() => { setSvcForm(barber.id); setSvc({ name: '', price: '' }) }}
                     className="w-full py-[11px] rounded-xl text-[13px] font-medium flex items-center justify-center gap-2 transition-all active:scale-95"
-                    style={{ border: '1px dashed rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.3)' }}>
+                    style={{ border: '1px dashed var(--bd-2)', color: 'var(--tx-4)' }}>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                     </svg>

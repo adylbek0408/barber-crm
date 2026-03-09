@@ -2,22 +2,35 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Sum, Count, Avg
 from django.db.models.functions import TruncDay, TruncMonth
-from apps.accounts.permissions import IsOwnerOrAdmin
+from datetime import datetime
+from apps.accounts.permissions import IsOwner
 from apps.appointments.models import Appointment
 
 
+def parse_month(month_str):
+    """Валидация параметра month: ожидается YYYY-MM. Возвращает (year, month) или None."""
+    if not month_str or not month_str.strip():
+        return None
+    try:
+        dt = datetime.strptime(month_str.strip(), '%Y-%m')
+        return dt.year, dt.month
+    except ValueError:
+        return None
+
+
 def apply_month_filter(qs, request):
-    """Хелпер: фильтрует queryset по параметру ?month=YYYY-MM"""
+    """Хелпер: фильтрует queryset по параметру ?month=YYYY-MM (только при валидном формате)."""
     month = request.query_params.get('month')
-    if month:
-        year, m = month.split('-')
+    parsed = parse_month(month) if month else None
+    if parsed:
+        year, m = parsed
         qs = qs.filter(created_at__year=year, created_at__month=m)
     return qs
 
 
 class AnalyticsSummaryView(APIView):
-    """Общая аналитика барбершопа"""
-    permission_classes = [IsOwnerOrAdmin]
+    """Общая аналитика барбершопа (только владелец)"""
+    permission_classes = [IsOwner]
 
     def get(self, request):
         qs = Appointment.objects.filter(
@@ -34,8 +47,9 @@ class AnalyticsSummaryView(APIView):
             qs = qs.filter(created_at__date__gte=date_from)
         if date_to:
             qs = qs.filter(created_at__date__lte=date_to)
-        if month:
-            year, m = month.split('-')
+        parsed = parse_month(month) if month else None
+        if parsed:
+            year, m = parsed
             qs = qs.filter(created_at__year=year, created_at__month=m)
         if branch_id:
             qs = qs.filter(branch_id=branch_id)
@@ -60,8 +74,8 @@ class AnalyticsSummaryView(APIView):
 
 
 class AnalyticsByBranchView(APIView):
-    """Аналитика по филиалам"""
-    permission_classes = [IsOwnerOrAdmin]
+    """Аналитика по филиалам (только владелец)"""
+    permission_classes = [IsOwner]
 
     def get(self, request):
         qs = Appointment.objects.filter(
@@ -83,8 +97,8 @@ class AnalyticsByBranchView(APIView):
 
 
 class AnalyticsByBarberView(APIView):
-    """Аналитика по барберам"""
-    permission_classes = [IsOwnerOrAdmin]
+    """Аналитика по барберам (только владелец)"""
+    permission_classes = [IsOwner]
 
     def get(self, request):
         qs = Appointment.objects.filter(
@@ -108,8 +122,8 @@ class AnalyticsByBarberView(APIView):
 
 
 class AnalyticsByDayView(APIView):
-    """Аналитика по дням"""
-    permission_classes = [IsOwnerOrAdmin]
+    """Аналитика по дням (только владелец)"""
+    permission_classes = [IsOwner]
 
     def get(self, request):
         qs = Appointment.objects.filter(
@@ -126,8 +140,8 @@ class AnalyticsByDayView(APIView):
 
 
 class AnalyticsByMonthView(APIView):
-    """Аналитика по месяцам"""
-    permission_classes = [IsOwnerOrAdmin]
+    """Аналитика по месяцам (только владелец)"""
+    permission_classes = [IsOwner]
 
     def get(self, request):
         qs = Appointment.objects.filter(

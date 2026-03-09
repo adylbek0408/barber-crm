@@ -2,29 +2,7 @@ import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { ownerApi } from '../../api'
 import BottomNav from '../../components/BottomNav'
-
-function ConfirmModal({ text, onConfirm, onCancel, loading }) {
-  return (
-    <div className="modal-overlay">
-      <div className="modal-card">
-        <h3 className="font-bold text-[17px] mb-2 text-center" style={{ color: 'var(--tx)' }}>{text}</h3>
-        <p className="text-center text-[13px] mb-6" style={{ color: 'var(--tx-3)' }}>
-          Это действие нельзя отменить
-        </p>
-        <button onClick={onConfirm} disabled={loading}
-          className="w-full py-3 rounded-2xl font-semibold text-[15px] mb-3"
-          style={{ background: 'rgba(239,68,68,0.12)', color: '#dc2626', border: '1px solid rgba(239,68,68,0.25)' }}>
-          {loading ? 'Удаляем...' : 'Удалить'}
-        </button>
-        <button onClick={onCancel}
-          className="w-full py-3 rounded-2xl font-semibold text-[15px]"
-          style={{ background: 'var(--bg-deep)', color: 'var(--tx-3)' }}>
-          Отмена
-        </button>
-      </div>
-    </div>
-  )
-}
+import ConfirmModal from '../../components/ConfirmModal'
 
 export default function OwnerBranches() {
   const [branches, setBranches] = useState([])
@@ -89,7 +67,7 @@ export default function OwnerBranches() {
   }
 
   return (
-    <div className="min-h-screen pb-28" style={{ background: '#09090b' }}>
+    <div className="page min-h-screen pb-nav page-content">
 
       {/* Модал удаления */}
       {deleteId && (
@@ -101,12 +79,12 @@ export default function OwnerBranches() {
         />
       )}
 
-      <header className="px-5 pb-5 page-header">
-        <h1 className="text-[26px] font-black" style={{ color: 'var(--tx)' }}>Филиалы</h1>
+      <header className="px-4 sm:px-5 pb-5 page-header">
+        <h1 className="text-[22px] font-black" style={{ color: 'var(--tx)' }}>Филиалы</h1>
         <p className="text-sm mt-1" style={{ color: 'var(--tx-4)' }}>{branches.length} локаций</p>
       </header>
 
-      <div className="px-4 space-y-4">
+      <div className="px-4 sm:px-5 space-y-4">
 
         {/* Кнопка добавить */}
         {!editId && (
@@ -126,7 +104,7 @@ export default function OwnerBranches() {
         {/* Форма создания */}
         {showForm && !editId && (
           <div className="glass-card space-y-3 asi">
-            <p className="text-white font-bold text-lg">Новый филиал</p>
+            <p className="font-bold text-lg" style={{ color: 'var(--tx)' }}>Новый филиал</p>
             <input placeholder="Название (напр. Центр, Юг)" value={form.name}
               autoCorrect="off"
               onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
@@ -144,7 +122,7 @@ export default function OwnerBranches() {
         {/* Форма редактирования */}
         {editId && (
           <div className="glass-card space-y-3 asi">
-            <p className="text-white font-bold text-lg">Редактировать филиал</p>
+            <p className="font-bold text-lg" style={{ color: 'var(--tx)' }}>Редактировать филиал</p>
             <input placeholder="Название" value={editForm.name}
               autoCorrect="off"
               onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
@@ -174,7 +152,7 @@ export default function OwnerBranches() {
                 <polyline points="9 22 9 12 15 12 15 22"/>
               </svg>
             </div>
-            <p className="text-white/40 font-medium">Филиалов пока нет</p>
+            <p className="font-medium" style={{ color: 'var(--tx-3)' }}>Филиалов пока нет</p>
           </div>
         )}
 
@@ -183,29 +161,29 @@ export default function OwnerBranches() {
           <div key={b.id} className="glass-card afu" style={{ animationDelay: `${idx * 0.07}s` }}>
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2">
+                style={{ background: 'var(--bg-deep)', border: '1px solid var(--bd-2)' }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ic-2)" strokeWidth="2">
                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
                   <polyline points="9 22 9 12 15 12 15 22"/>
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <p className="text-white font-bold text-[16px]">{b.name}</p>
+                  <p className="text-[16px] font-bold truncate" style={{ color: 'var(--tx)' }}>{b.name}</p>
                   <span className={b.is_active ? 'badge-green' : 'badge-red'}>
                     {b.is_active ? 'Активен' : 'Закрыт'}
                   </span>
                 </div>
-                <p className="text-white/35 text-sm">{b.address}</p>
+                <p className="text-sm" style={{ color: 'var(--tx-3)' }}>{b.address}</p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 {/* Редактировать */}
                 <button
                   onClick={() => { setEditId(b.id); setEditForm({ name: b.name, address: b.address }); setShowForm(false) }}
-                  className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  className="w-9 h-9 rounded-xl flex items-center justify-center touch-target"
+                  style={{ background: 'var(--bg-deep)', border: '1px solid var(--bd-2)' }}>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                    stroke="rgba(255,255,255,0.5)" strokeWidth="2">
+                    stroke="var(--ic-2)" strokeWidth="2">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                   </svg>
@@ -214,8 +192,8 @@ export default function OwnerBranches() {
                 <button
                   onClick={() => setDeleteId(b.id)}
                   className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2">
+                  style={{ background: 'var(--danger-bg-subtle)', border: '1px solid var(--danger-border-subtle)' }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--danger-ic)" strokeWidth="2">
                     <polyline points="3 6 5 6 21 6"/>
                     <path d="M19 6l-1 14H6L5 6"/>
                     <path d="M10 11v6M14 11v6"/>

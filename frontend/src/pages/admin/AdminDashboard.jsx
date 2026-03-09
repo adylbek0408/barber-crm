@@ -51,30 +51,33 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen pb-10" style={{ background: '#09090b' }}>
+      <div className="page min-h-screen pb-nav page-content">
 
-      <header className="px-5 pb-5 page-header">
+      <header className="px-4 sm:px-5 pb-5 page-header">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[12px] font-medium mb-[2px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <p className="text-[12px] font-medium mb-[2px]" style={{ color: 'var(--tx-4)' }}>
               Администратор
             </p>
-            <h1 className="text-[22px] font-black text-white">Платформа</h1>
+            <h1 className="text-[22px] font-black" style={{ color: 'var(--tx)' }}>Платформа</h1>
           </div>
-          <button onClick={logout}
-            className="w-9 h-9 rounded-xl flex items-center justify-center"
-            style={{ background: '#1a1a1f', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-              stroke="rgba(255,255,255,0.35)" strokeWidth="2.2" strokeLinecap="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button onClick={logout}
+              className="w-9 h-9 rounded-xl flex items-center justify-center touch-target"
+              style={{ background: 'var(--bg-el)', border: '1px solid var(--bd)' }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="var(--ic)" strokeWidth="2.2" strokeLinecap="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </header>
 
-      <div className="px-4 space-y-3">
+      <div className="px-4 sm:px-5 space-y-3">
         <button onClick={() => setShowForm(v => !v)} className={showForm ? 'btn-outline' : 'btn-primary'}>
           {showForm ? (
             <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -89,7 +92,7 @@ export default function AdminDashboard() {
 
         {showForm && (
           <div className="card space-y-3 asi">
-            <p className="text-white font-bold text-[15px]">Новый барбершоп</p>
+            <p className="font-bold text-[15px]" style={{ color: 'var(--tx)' }}>Новый барбершоп</p>
             {FIELDS.map(({ key, placeholder, type = 'text' }) => (
               <input
                 key={key}
@@ -115,14 +118,14 @@ export default function AdminDashboard() {
         {shops.length === 0 && !showForm && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
-              style={{ background: '#111113', border: '1px solid rgba(255,255,255,0.06)' }}>
+              style={{ background: 'var(--bg-card)', border: '1px solid var(--bd)' }}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="rgba(255,255,255,0.2)" strokeWidth="1.8" strokeLinecap="round">
+                stroke="var(--ic)" strokeWidth="1.8" strokeLinecap="round">
                 <path d="M6 2v12M6 14c0 2.2 1.8 4 4 4h4a4 4 0 0 0 0-8H6"/>
                 <path d="M18 2v12"/>
               </svg>
             </div>
-            <p className="font-medium" style={{ color: 'rgba(255,255,255,0.35)' }}>Барбершопов пока нет</p>
+            <p className="font-medium" style={{ color: 'var(--tx-3)' }}>Барбершопов пока нет</p>
           </div>
         )}
 
@@ -130,47 +133,47 @@ export default function AdminDashboard() {
           <div key={shop.id} className="card afu" style={{ animationDelay: `${idx * 0.06}s` }}>
             <div className="flex items-start gap-3 mb-3">
               <div className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 font-black text-[15px]"
-                style={{ background: '#1a1a1f', color: 'rgba(255,255,255,0.6)' }}>
+                style={{ background: 'var(--bg-el)', color: 'var(--tx-2)' }}>
                 {shop.name?.[0]?.toUpperCase() || 'B'}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-[3px]">
-                  <p className="text-white font-bold text-[15px] truncate">{shop.name}</p>
+                  <p className="font-bold text-[15px] truncate" style={{ color: 'var(--tx)' }}>{shop.name}</p>
                   <span className={shop.is_active ? 'badge-green' : 'badge-red'}>
                     {shop.is_active ? 'Активен' : 'Заблок.'}
                   </span>
                 </div>
-                <p className="text-[12px] truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                <p className="text-[12px] truncate" style={{ color: 'var(--tx-3)' }}>
                   {shop.owner_name} · {shop.phone}
                 </p>
-                <p className="text-[11px] mt-[2px]" style={{ color: 'rgba(255,255,255,0.2)' }}>{shop.address}</p>
+                <p className="text-[11px] mt-[2px]" style={{ color: 'var(--tx-5)' }}>{shop.address}</p>
               </div>
               <button
                 onClick={() => handleToggle(shop.id)}
-                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 touch-target"
                 style={shop.is_active
-                  ? { background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)' }
-                  : { background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.15)' }
+                  ? { background: 'var(--danger-bg-subtle)', border: '1px solid var(--danger-border-subtle)' }
+                  : { background: 'var(--success-bg)', border: '1px solid var(--success-border)' }
                 }>
                 {shop.is_active
-                  ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--danger-ic)" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--success-ic)" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 }
               </button>
             </div>
 
             {shop.subscription && (
               <div className="rounded-xl px-3 py-[10px] flex items-center justify-between"
-                style={{ background: '#0f0f12', border: '1px solid rgba(255,255,255,0.05)' }}>
+                style={{ background: 'var(--bg-deep)', border: '1px solid var(--bd)' }}>
                 <div className="flex items-center gap-2">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                    stroke="rgba(255,255,255,0.3)" strokeWidth="2">
+                    stroke="var(--ic)" strokeWidth="2">
                     <rect x="3" y="4" width="18" height="18" rx="2"/>
                     <line x1="16" y1="2" x2="16" y2="6"/>
                     <line x1="8" y1="2" x2="8" y2="6"/>
                     <line x1="3" y1="10" x2="21" y2="10"/>
                   </svg>
-                  <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                  <span className="text-[12px]" style={{ color: 'var(--tx-3)' }}>
                     {shop.subscription.plan} · до {shop.subscription.expires_at}
                   </span>
                 </div>

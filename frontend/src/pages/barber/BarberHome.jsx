@@ -5,6 +5,7 @@ import useAuthStore from '../../store/authStore'
 import InstallPWA from '../../components/InstallPWA'
 import ServiceForm from '../../components/ServiceForm'
 import ThemeToggle from '../../components/ThemeToggle'
+import ConfirmModal from '../../components/ConfirmModal'
 
 const S = { SELECT: 'select', PAY: 'pay', DONE: 'done' }
 const TAB = { WORK: 'work', SERVICES: 'services' }
@@ -68,33 +69,18 @@ export default function BarberHome() {
   return (
     <div className="page min-h-screen flex flex-col">
 
-      {/* ── Кастомный диалог удаления ── */}
+      {/* Диалог удаления услуги */}
       {deleteConfirm && (
-        <div className="modal-overlay">
-          <div className="modal-card">
-            <h3 className="font-bold text-[17px] mb-2 text-center" style={{ color: 'var(--tx)' }}>Удалить услугу?</h3>
-            <p className="text-center text-[13px] mb-6" style={{ color: 'var(--tx-3)' }}>
-              Это действие нельзя отменить
-            </p>
-            <button
-              onClick={() => handleDeleteService(deleteConfirm)}
-              disabled={deleting}
-              className="w-full py-3 rounded-2xl font-semibold text-[15px] mb-3"
-              style={{ background: 'rgba(239,68,68,0.12)', color: '#dc2626', border: '1px solid rgba(239,68,68,0.25)' }}>
-              {deleting ? 'Удаляем...' : 'Удалить'}
-            </button>
-            <button
-              onClick={() => setDeleteConfirm(null)}
-              className="w-full py-3 rounded-2xl font-semibold text-[15px]"
-              style={{ background: 'var(--bg-deep)', color: 'var(--tx-3)' }}>
-              Отмена
-            </button>
-          </div>
-        </div>
+        <ConfirmModal
+          text="Удалить услугу?"
+          loading={deleting}
+          onConfirm={() => handleDeleteService(deleteConfirm)}
+          onCancel={() => setDeleteConfirm(null)}
+        />
       )}
 
       {/* Шапка */}
-      <header className="px-5 pb-3 page-header flex items-center justify-between">
+      <header className="px-4 sm:px-5 pb-3 page-header flex items-center justify-between">
         <div>
           <p className="text-[12px] mb-[2px]" style={{ color: 'var(--tx-4)' }}>{date}</p>
           <h1 className="text-[19px] font-bold" style={{ color: 'var(--tx)' }}>
@@ -118,12 +104,12 @@ export default function BarberHome() {
       </header>
 
       {/* PWA install */}
-      <div className="px-4 pb-1">
+      <div className="px-4 sm:px-5 pb-1">
         <InstallPWA />
       </div>
 
       {/* Табы */}
-      <div className="px-4 pb-3 flex gap-2">
+      <div className="px-4 sm:px-5 pb-3 flex gap-2">
         {[
           { id: TAB.WORK, label: 'Запись' },
           { id: TAB.SERVICES, label: 'Мои услуги' },
@@ -432,8 +418,8 @@ export default function BarberHome() {
                     <button
                       onClick={() => setDeleteConfirm(s.id)}
                       className="w-9 h-9 rounded-xl flex items-center justify-center"
-                      style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
+                      style={{ background: 'var(--danger-bg-subtle)', border: '1px solid var(--danger-border-subtle)' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--danger-ic)" strokeWidth="2">
                         <polyline points="3 6 5 6 21 6"/>
                         <path d="M19 6l-1 14H6L5 6"/>
                         <path d="M10 11v6M14 11v6"/>

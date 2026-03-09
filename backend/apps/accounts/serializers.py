@@ -19,7 +19,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'phone', 'role']
+        fields = ['id', 'username', 'first_name', 'last_name', 'full_name', 'email', 'phone', 'role']
         read_only_fields = ['id', 'role']
+
+    def get_full_name(self, obj):
+        return obj.get_full_name()
