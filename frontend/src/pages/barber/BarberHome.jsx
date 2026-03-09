@@ -95,7 +95,7 @@ export default function BarberHome() {
       )}
 
       {/* Шапка */}
-      <header className="px-5 pt-12 pb-3 flex items-center justify-between">
+      <header className="px-5 pb-3 page-header flex items-center justify-between">
         <div>
           <p className="text-[12px] mb-[2px]" style={{ color: 'rgba(255,255,255,0.25)' }}>{date}</p>
           <h1 className="text-[19px] font-bold text-white">

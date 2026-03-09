@@ -91,7 +91,7 @@ export default function OwnerBranches() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] pb-28">
+    <div className="min-h-screen pb-28" style={{ background: '#09090b' }}>
 
       {/* Модал удаления */}
       {deleteId && (
@@ -103,7 +103,7 @@ export default function OwnerBranches() {
         />
       )}
 
-      <header className="px-5 pt-14 pb-5">
+      <header className="px-5 pb-5 page-header">
         <h1 className="text-[26px] font-black text-white">Филиалы</h1>
         <p className="text-white/30 text-sm mt-1">{branches.length} локаций</p>
       </header>

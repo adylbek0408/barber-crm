@@ -32,27 +32,29 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-[#09090b] px-6 py-12">
-
-      {/* Верх */}
-      <div />
+    <div className="min-h-screen flex flex-col justify-between bg-[#09090b] px-6"
+      style={{ paddingTop: 'calc(env(safe-area-inset-top) + 48px)', paddingBottom: 'calc(env(safe-area-inset-bottom) + 32px)' }}>
 
       {/* Центр */}
       <div className="afu">
         {/* Лого */}
         <div className="mb-10">
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5"
-            style={{ background: '#1a1a1f', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-              stroke="rgba(255,255,255,0.7)" strokeWidth="1.8" strokeLinecap="round">
+          <div className="w-[76px] h-[76px] rounded-[24px] flex items-center justify-center mb-6"
+            style={{
+              background: 'linear-gradient(150deg, #222228, #17171d)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.5)'
+            }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none"
+              stroke="rgba(255,255,255,0.85)" strokeWidth="1.6" strokeLinecap="round">
               <path d="M6 2v12M6 14c0 2.2 1.8 4 4 4h4a4 4 0 0 0 0-8H6"/>
               <path d="M18 2v12"/>
             </svg>
           </div>
-          <h1 className="text-[28px] font-black text-white tracking-tight leading-none mb-2">
+          <h1 className="text-[40px] font-black text-white tracking-tight leading-none mb-2">
             BarberCRM
           </h1>
-          <p className="text-[14px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          <p className="text-[15px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
             Платформа для барбершопов
           </p>
         </div>
@@ -101,8 +103,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <InstallPWA className="mt-3" />
-
         <button onClick={handleLogin} disabled={loading} className="btn-primary mt-3">
           {loading
             ? <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
@@ -114,9 +114,12 @@ export default function LoginPage() {
       </div>
 
       {/* Низ */}
-      <p className="text-center text-[12px]" style={{ color: 'rgba(255,255,255,0.12)' }}>
-        BarberCRM · iAnt Studio
-      </p>
+      <div className="space-y-3">
+        <InstallPWA />
+        <p className="text-center text-[12px]" style={{ color: 'rgba(255,255,255,0.12)' }}>
+          BarberCRM · iAnt Studio
+        </p>
+      </div>
     </div>
   )
 }

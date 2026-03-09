@@ -47,7 +47,7 @@ registerSW({
     )
   },
   onOfflineReady() {
-    toast('✅ Приложение готово к работе офлайн', {
+    toast('Готово к работе офлайн', {
       duration: 3000,
       style: {
         background: '#1a1a1f',
@@ -67,9 +67,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         position="top-center"
         toastOptions={{
           style: {
-            background: '#16213e',
-            color: '#fff',
+            background: '#1a1a1f',
+            color: '#f1f5f9',
             borderRadius: '12px',
+            border: '1px solid rgba(255,255,255,0.08)',
+            fontSize: '14px',
           },
         }}
       />

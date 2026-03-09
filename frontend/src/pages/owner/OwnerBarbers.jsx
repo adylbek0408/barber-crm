@@ -148,7 +148,7 @@ export default function OwnerBarbers() {
         />
       )}
 
-      <header className="px-5 pt-12 pb-5">
+      <header className="px-5 pb-5 page-header">
         <h1 className="text-[24px] font-black text-white">Барберы</h1>
         <p className="text-[13px] mt-1" style={{ color: 'rgba(255,255,255,0.25)' }}>
           {barbers.length} сотрудников

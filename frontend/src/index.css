@@ -153,6 +153,11 @@
 .asi { animation: scaleIn 0.25s ease forwards; }
 .ach { animation: check   0.45s cubic-bezier(.175,.885,.32,1.275) forwards; }
 
+/* Safe area */
+.pt-safe     { padding-top: env(safe-area-inset-top); }
+.pb-safe     { padding-bottom: env(safe-area-inset-bottom); }
+.page-header { padding-top: calc(env(safe-area-inset-top) + 20px); }
+
 /* Скрыть скроллбар */
 .noscroll::-webkit-scrollbar { display: none; }
 .noscroll { -ms-overflow-style: none; scrollbar-width: none; }

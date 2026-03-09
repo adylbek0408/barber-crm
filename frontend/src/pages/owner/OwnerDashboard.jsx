@@ -75,7 +75,7 @@ export default function OwnerDashboard() {
     <div className="min-h-screen pb-28" style={{ background: '#09090b' }}>
 
       {/* Шапка */}
-      <header className="px-5 pt-12 pb-4">
+      <header className="px-5 pb-4 page-header">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-[12px] font-medium mb-[2px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
