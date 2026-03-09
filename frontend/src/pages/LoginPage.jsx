@@ -39,22 +39,17 @@ export default function LoginPage() {
       <div className="afu">
         {/* Лого */}
         <div className="mb-10">
-          <div className="w-[76px] h-[76px] rounded-[24px] flex items-center justify-center mb-6"
-            style={{
-              background: 'linear-gradient(150deg, #222228, #17171d)',
-              border: '1px solid rgba(255,255,255,0.12)',
-              boxShadow: '0 12px 40px rgba(0,0,0,0.5)'
-            }}>
+          <div className="logo-box w-[76px] h-[76px] mb-6">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none"
-              stroke="rgba(255,255,255,0.85)" strokeWidth="1.6" strokeLinecap="round">
+              stroke="var(--ic-2)" strokeWidth="1.6" strokeLinecap="round">
               <path d="M6 2v12M6 14c0 2.2 1.8 4 4 4h4a4 4 0 0 0 0-8H6"/>
               <path d="M18 2v12"/>
             </svg>
           </div>
-          <h1 className="text-[40px] font-black text-white tracking-tight leading-none mb-2">
+          <h1 className="text-[40px] font-black tracking-tight leading-none mb-2" style={{ color: 'var(--tx)' }}>
             BarberCRM
           </h1>
-          <p className="text-[15px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          <p className="text-[15px]" style={{ color: 'var(--tx-4)' }}>
             Платформа для барбершопов
           </p>
         </div>
@@ -71,7 +66,7 @@ export default function LoginPage() {
         <div className="space-y-3">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-widest mb-2"
-              style={{ color: 'rgba(255,255,255,0.25)' }}>Логин</p>
+              style={{ color: 'var(--tx-4)' }}>Логин</p>
             <input type="text" value={username}
               onChange={(e) => { setUsername(e.target.value); setErr('') }}
               onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
@@ -90,7 +85,7 @@ export default function LoginPage() {
                 className="input-field pr-12" />
               <button type="button" onClick={() => setShowPass(!showPass)}
                 className="absolute right-4 top-1/2 -translate-y-1/2"
-                style={{ color: 'rgba(255,255,255,0.25)' }}>
+                style={{ color: 'var(--ic)' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   {showPass
@@ -116,7 +111,7 @@ export default function LoginPage() {
       {/* Низ */}
       <div className="space-y-3">
         <InstallPWA />
-        <p className="text-center text-[12px]" style={{ color: 'rgba(255,255,255,0.12)' }}>
+        <p className="text-center text-[12px]" style={{ color: 'var(--tx-5)' }}>
           BarberCRM · iAnt Studio
         </p>
       </div>

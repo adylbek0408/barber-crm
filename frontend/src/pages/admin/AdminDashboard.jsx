@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { adminApi } from '../../api'
 import useAuthStore from '../../store/authStore'
+import ThemeToggle from '../../components/ThemeToggle'
 
 // Поля формы — определены ВНЕ компонента (иначе клавиатура закрывается на мобиле)
 const FIELDS = [

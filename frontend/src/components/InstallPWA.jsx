@@ -89,38 +89,38 @@ export default function InstallPWA({ className = '' }) {
       {showSheet && (
         <div
           className="fixed inset-0 z-[999] flex items-end"
-          style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)' }}
+          style={{ background: 'var(--overlay)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}
           onClick={() => setShowSheet(false)}>
           <div
             className="w-full rounded-t-3xl pb-8"
-            style={{ background: '#141417', border: '1px solid rgba(255,255,255,0.08)' }}
+            style={{ background: 'var(--bg-el)', border: '1px solid var(--bd-2)' }}
             onClick={e => e.stopPropagation()}>
 
             <div className="flex justify-center pt-3 pb-5">
-              <div className="w-9 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.12)' }} />
+              <div className="w-9 h-1 rounded-full" style={{ background: 'var(--bd-3)' }} />
             </div>
 
-            <p className="text-white font-bold text-[17px] text-center mb-6 px-6">
+            <p className="font-bold text-[17px] text-center mb-6 px-6" style={{ color: 'var(--tx)' }}>
               Добавить на главный экран
             </p>
 
             <div className="px-5 space-y-3 mb-7">
               {IOS_STEPS.map(({ icon, title, sub }, i) => (
                 <div key={i} className="flex items-center gap-4 px-4 py-3 rounded-2xl"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  style={{ background: 'var(--bg-card)', border: '1px solid var(--bd)' }}>
                   <div className="relative flex-shrink-0">
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center"
-                      style={{ background: '#1e1e24' }}>
+                      style={{ background: 'var(--bg-deep)' }}>
                       {icon}
                     </div>
                     <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center"
-                      style={{ background: '#f8fafc' }}>
-                      <span className="text-[9px] font-black text-black">{i + 1}</span>
+                      style={{ background: 'var(--btn-bg)' }}>
+                      <span className="text-[9px] font-black" style={{ color: 'var(--btn-tx)' }}>{i + 1}</span>
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[13px] font-semibold text-white leading-tight">{title}</p>
-                    <p className="text-[11px] mt-[2px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{sub}</p>
+                    <p className="text-[11px] mt-[2px]" style={{ color: 'var(--tx-3)' }}>{sub}</p>
                   </div>
                 </div>
               ))}
@@ -129,8 +129,7 @@ export default function InstallPWA({ className = '' }) {
             <div className="px-5">
               <button
                 onClick={() => setShowSheet(false)}
-                className="w-full py-3 rounded-2xl text-[14px] font-bold"
-                style={{ background: '#f8fafc', color: '#09090b' }}>
+                className="w-full py-3 rounded-2xl text-[14px] font-bold btn-primary">
                 Понял
               </button>
             </div>

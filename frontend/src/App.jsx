@@ -1,5 +1,20 @@
+import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import useAuthStore from './store/authStore'
+import useThemeStore from './store/themeStore'
+
+// Применяет data-theme на <html> и обновляет каждую минуту
+function ThemeManager() {
+  const { theme, tick } = useThemeStore()
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
+  useEffect(() => {
+    const id = setInterval(tick, 60_000)
+    return () => clearInterval(id)
+  }, [])
+  return null
+}
 
 // Pages
 import LoginPage from './pages/LoginPage'
@@ -20,6 +35,8 @@ export default function App() {
   const { user } = useAuthStore()
 
   return (
+    <>
+    <ThemeManager />
     <Routes>
       <Route path="/login" element={<LoginPage />} />
 
@@ -52,5 +69,6 @@ export default function App() {
         <Navigate to="/login" />
       } />
     </Routes>
+    </>
   )
 }

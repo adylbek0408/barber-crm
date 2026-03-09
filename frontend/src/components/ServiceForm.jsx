@@ -38,7 +38,7 @@ export default function ServiceForm({ onDone, service = null }) {
 
   return (
     <div className="glass-card space-y-3 asi mb-4">
-      <p className="text-white font-bold">{isEdit ? 'Редактировать услугу' : 'Новая услуга'}</p>
+      <p className="font-bold" style={{ color: 'var(--tx)' }}>{isEdit ? 'Редактировать услугу' : 'Новая услуга'}</p>
       <input
         placeholder="Название (напр. Стрижка)"
         value={form.name}

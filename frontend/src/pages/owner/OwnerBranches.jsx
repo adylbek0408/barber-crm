@@ -5,22 +5,20 @@ import BottomNav from '../../components/BottomNav'
 
 function ConfirmModal({ text, onConfirm, onCancel, loading }) {
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center px-6"
-      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }}>
-      <div className="w-full max-w-xs rounded-3xl p-6"
-        style={{ background: '#1a1a1f', border: '1px solid rgba(255,255,255,0.1)' }}>
-        <h3 className="text-white font-bold text-[17px] mb-2 text-center">{text}</h3>
-        <p className="text-center text-[13px] mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
+    <div className="modal-overlay">
+      <div className="modal-card">
+        <h3 className="font-bold text-[17px] mb-2 text-center" style={{ color: 'var(--tx)' }}>{text}</h3>
+        <p className="text-center text-[13px] mb-6" style={{ color: 'var(--tx-3)' }}>
           Это действие нельзя отменить
         </p>
         <button onClick={onConfirm} disabled={loading}
           className="w-full py-3 rounded-2xl font-semibold text-[15px] mb-3"
-          style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }}>
+          style={{ background: 'rgba(239,68,68,0.12)', color: '#dc2626', border: '1px solid rgba(239,68,68,0.25)' }}>
           {loading ? 'Удаляем...' : 'Удалить'}
         </button>
         <button onClick={onCancel}
           className="w-full py-3 rounded-2xl font-semibold text-[15px]"
-          style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}>
+          style={{ background: 'var(--bg-deep)', color: 'var(--tx-3)' }}>
           Отмена
         </button>
       </div>
@@ -104,8 +102,8 @@ export default function OwnerBranches() {
       )}
 
       <header className="px-5 pb-5 page-header">
-        <h1 className="text-[26px] font-black text-white">Филиалы</h1>
-        <p className="text-white/30 text-sm mt-1">{branches.length} локаций</p>
+        <h1 className="text-[26px] font-black" style={{ color: 'var(--tx)' }}>Филиалы</h1>
+        <p className="text-sm mt-1" style={{ color: 'var(--tx-4)' }}>{branches.length} локаций</p>
       </header>
 
       <div className="px-4 space-y-4">
@@ -170,8 +168,8 @@ export default function OwnerBranches() {
         {branches.length === 0 && !showForm && !editId && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-4"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5">
+              style={{ background: 'var(--bg-deep)', border: '1px solid var(--bd-2)' }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ic)" strokeWidth="1.5">
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
                 <polyline points="9 22 9 12 15 12 15 22"/>
               </svg>

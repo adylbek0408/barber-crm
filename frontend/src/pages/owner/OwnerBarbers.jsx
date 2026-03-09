@@ -8,22 +8,20 @@ const INPUT = 'input-field text-[14px] py-3'
 // Кастомный диалог подтверждения
 function ConfirmModal({ text, onConfirm, onCancel, loading }) {
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center px-6"
-      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }}>
-      <div className="w-full max-w-xs rounded-3xl p-6"
-        style={{ background: '#1a1a1f', border: '1px solid rgba(255,255,255,0.1)' }}>
-        <h3 className="text-white font-bold text-[17px] mb-2 text-center">{text}</h3>
-        <p className="text-center text-[13px] mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
+    <div className="modal-overlay">
+      <div className="modal-card">
+        <h3 className="font-bold text-[17px] mb-2 text-center" style={{ color: 'var(--tx)' }}>{text}</h3>
+        <p className="text-center text-[13px] mb-6" style={{ color: 'var(--tx-3)' }}>
           Это действие нельзя отменить
         </p>
         <button onClick={onConfirm} disabled={loading}
           className="w-full py-3 rounded-2xl font-semibold text-[15px] mb-3"
-          style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }}>
+          style={{ background: 'rgba(239,68,68,0.12)', color: '#dc2626', border: '1px solid rgba(239,68,68,0.25)' }}>
           {loading ? 'Удаляем...' : 'Удалить'}
         </button>
         <button onClick={onCancel}
           className="w-full py-3 rounded-2xl font-semibold text-[15px]"
-          style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}>
+          style={{ background: 'var(--bg-deep)', color: 'var(--tx-3)' }}>
           Отмена
         </button>
       </div>
@@ -126,7 +124,7 @@ export default function OwnerBarbers() {
   }
 
   return (
-    <div className="min-h-screen pb-28" style={{ background: '#09090b' }}>
+    <div className="page min-h-screen pb-28">
 
       {/* Модал удаления барбера */}
       {deleteBarber && (
@@ -149,8 +147,8 @@ export default function OwnerBarbers() {
       )}
 
       <header className="px-5 pb-5 page-header">
-        <h1 className="text-[24px] font-black text-white">Барберы</h1>
-        <p className="text-[13px] mt-1" style={{ color: 'rgba(255,255,255,0.25)' }}>
+        <h1 className="text-[24px] font-black" style={{ color: 'var(--tx)' }}>Барберы</h1>
+        <p className="text-[13px] mt-1" style={{ color: 'var(--tx-4)' }}>
           {barbers.length} сотрудников
         </p>
       </header>
@@ -217,21 +215,21 @@ export default function OwnerBarbers() {
           <div key={barber.id} className="card afu" style={{ animationDelay: `${idx * 0.06}s` }}>
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl flex items-center justify-center font-black text-[16px] flex-shrink-0"
-                style={{ background: '#1a1a1f', color: 'rgba(255,255,255,0.6)' }}>
+                style={{ background: 'var(--bg-el)', color: 'var(--tx-2)' }}>
                 {barber.first_name?.[0]?.toUpperCase() || '?'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[15px] font-semibold text-white truncate">{barber.full_name}</p>
-                <p className="text-[12px] truncate" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                <p className="text-[15px] font-semibold truncate" style={{ color: 'var(--tx)' }}>{barber.full_name}</p>
+                <p className="text-[12px] truncate" style={{ color: 'var(--tx-4)' }}>
                   {barber.branch_name}{barber.phone ? ` · ${barber.phone}` : ''}
                 </p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button onClick={() => setExpanded(v => v === barber.id ? null : barber.id)}
                   className="w-8 h-8 rounded-xl flex items-center justify-center"
-                  style={{ background: '#1a1a1f' }}>
+                  style={{ background: 'var(--bg-el)' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                    stroke="rgba(255,255,255,0.3)" strokeWidth="2"
+                  stroke="var(--ic)" strokeWidth="2"
                     style={{ transform: expanded === barber.id ? 'rotate(180deg)' : 'none', transition: '0.2s' }}>
                     <polyline points="6 9 12 15 18 9"/>
                   </svg>
@@ -250,17 +248,17 @@ export default function OwnerBarbers() {
             {expanded === barber.id && (
               <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                 <p className="text-[11px] font-semibold uppercase tracking-widest mb-3"
-                  style={{ color: 'rgba(255,255,255,0.2)' }}>Услуги</p>
+                  style={{ color: 'var(--tx-5)' }}>Услуги</p>
 
                 {barber.services?.length === 0 &&
-                  <p className="text-[13px] mb-3" style={{ color: 'rgba(255,255,255,0.2)' }}>Нет услуг</p>}
+                  <p className="text-[13px] mb-3" style={{ color: 'var(--tx-5)' }}>Нет услуг</p>}
 
                 <div className="space-y-[6px] mb-3">
                   {barber.services?.map(s => (
                     <div key={s.id}>
                       {/* Режим редактирования */}
                       {editSvc === s.id ? (
-                        <div className="rounded-xl p-3 space-y-2" style={{ background: '#0f0f12' }}>
+                        <div className="rounded-xl p-3 space-y-2" style={{ background: 'var(--bg-deep)' }}>
                           <div className="grid grid-cols-2 gap-2">
                             <input
                               className="input-field text-[13px] py-2"
@@ -281,12 +279,12 @@ export default function OwnerBarbers() {
                           <div className="grid grid-cols-2 gap-2">
                             <button onClick={saveEditSvc} disabled={savingSvc}
                               className="py-2 rounded-xl text-[13px] font-semibold"
-                              style={{ background: 'rgba(255,255,255,0.1)', color: '#fff' }}>
+                              style={{ background: 'var(--bd-2)', color: 'var(--tx)' }}>
                               {savingSvc ? 'Сохр...' : 'Сохранить'}
                             </button>
                             <button onClick={() => setEditSvc(null)}
                               className="py-2 rounded-xl text-[13px] font-semibold"
-                              style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.4)' }}>
+                              style={{ background: 'var(--bg-deep)', color: 'var(--tx-3)' }}>
                               Отмена
                             </button>
                           </div>
@@ -294,20 +292,20 @@ export default function OwnerBarbers() {
                       ) : (
                         /* Обычный вид */
                         <div className="flex items-center justify-between px-3 py-[10px] rounded-xl"
-                          style={{ background: '#0f0f12' }}>
-                          <span className="text-[13px] font-medium flex-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                          style={{ background: 'var(--bg-deep)' }}>
+                          <span className="text-[13px] font-medium flex-1" style={{ color: 'var(--tx-2)' }}>
                             {s.name}
                           </span>
-                          <span className="text-[13px] font-semibold text-white mr-3">
+                          <span className="text-[13px] font-semibold mr-3" style={{ color: 'var(--tx)' }}>
                             {Number(s.price).toLocaleString()} сом
                           </span>
                           {/* Редактировать */}
                           <button
                             onClick={() => { setEditSvc(s.id); setEditSvcData({ name: s.name, price: s.price }) }}
                             className="w-7 h-7 rounded-lg flex items-center justify-center mr-1"
-                            style={{ background: 'rgba(255,255,255,0.06)' }}>
+                            style={{ background: 'var(--bd)' }}>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                              stroke="rgba(255,255,255,0.4)" strokeWidth="2">
+                              stroke="var(--ic-2)" strokeWidth="2">
                               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                             </svg>
