@@ -19,8 +19,8 @@ function getBrowser() {
 
 const GUIDES = {
   ios: [
-    { icon: '⬆️', text: 'Нажми кнопку «Поделиться» (квадрат со стрелкой вверх) в нижней панели Safari' },
-    { icon: '📜', text: 'Прокрути список действий вниз — найди «На экран "Домой"»' },
+    { icon: '⬆️', text: 'Нажми кнопку «Поделиться» (квадрат со стрелкой) внизу Safari' },
+    { icon: '📜', text: 'Прокрути список иконок действий вниз' },
     { icon: '📲', text: 'Нажми «На экран "Домой"»' },
     { icon: '✅', text: 'Нажми «Добавить» в правом верхнем углу' },
   ],
@@ -62,54 +62,55 @@ function getGuide() {
   return { title: 'Установить приложение', steps: GUIDES.default }
 }
 
+// Сессия — показываем каждый раз при входе, не запоминаем навсегда
+// Пользователь может скрыть только кнопкой "Больше не показывать"
+const STORAGE_KEY = 'pwa-install-hidden-v2'
+
 export default function InstallPWA({ className = '' }) {
-  const [installed, setInstalled] = useState(false)
+  const [isStandalone, setIsStandalone] = useState(false)
   const [prompt, setPrompt] = useState(null)
   const [showGuide, setShowGuide] = useState(false)
-  const [dismissed, setDismissed] = useState(false)
+  const [hidden, setHidden] = useState(false)
 
   useEffect(() => {
     // Уже запущено как PWA?
-    if (
+    const standalone =
       window.matchMedia('(display-mode: standalone)').matches ||
       window.navigator.standalone === true
-    ) {
-      setInstalled(true)
-      return
+    if (standalone) { setIsStandalone(true); return }
+
+    // Скрыт навсегда?
+    if (localStorage.getItem(STORAGE_KEY) === '1') {
+      setHidden(true)
     }
 
-    // Проверяем localStorage
-    if (localStorage.getItem('pwa-dismissed') === '1') {
-      setDismissed(true)
-    }
-
-    // Нативный prompt (Chrome/Edge HTTPS)
-    const handler = (e) => {
-      e.preventDefault()
-      setPrompt(e)
-    }
+    // Нативный prompt (Chrome/Edge по HTTPS)
+    const handler = (e) => { e.preventDefault(); setPrompt(e) }
     window.addEventListener('beforeinstallprompt', handler)
-    window.addEventListener('appinstalled', () => {
-      setInstalled(true)
-      setPrompt(null)
-    })
+    window.addEventListener('appinstalled', () => setIsStandalone(true))
     return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [])
 
-  function dismiss() {
-    localStorage.setItem('pwa-dismissed', '1')
-    setDismissed(true)
+  function hideForever() {
+    localStorage.setItem(STORAGE_KEY, '1')
+    setHidden(true)
   }
 
-  if (installed || dismissed) return null
-
-  const { title, steps } = getGuide()
+  function hideSess() {
+    // Скрыть только на эту сессию (не в localStorage)
+    setHidden(true)
+  }
 
   async function handleNativeInstall() {
+    if (!prompt) return
     prompt.prompt()
     const { outcome } = await prompt.userChoice
-    if (outcome === 'accepted') setInstalled(true)
+    if (outcome === 'accepted') setIsStandalone(true)
   }
+
+  if (isStandalone || hidden) return null
+
+  const { title, steps } = getGuide()
 
   return (
     <>
@@ -136,10 +137,11 @@ export default function InstallPWA({ className = '' }) {
           stroke="rgba(255,255,255,0.2)" strokeWidth="2" strokeLinecap="round">
           <polyline points="9 18 15 12 9 6"/>
         </svg>
+        {/* Закрыть на сессию */}
         <div
           role="button" tabIndex={0}
-          onClick={e => { e.stopPropagation(); dismiss() }}
-          onKeyDown={e => e.key === 'Enter' && (e.stopPropagation(), dismiss())}
+          onClick={e => { e.stopPropagation(); hideSess() }}
+          onKeyDown={e => e.key === 'Enter' && (e.stopPropagation(), hideSess())}
           className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
           style={{ background: 'rgba(255,255,255,0.08)' }}>
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
@@ -150,14 +152,14 @@ export default function InstallPWA({ className = '' }) {
         </div>
       </button>
 
-      {/* Инструкция */}
+      {/* Модальная инструкция */}
       {showGuide && (
         <div
           className="fixed inset-0 z-[999] flex items-end"
-          style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)' }}
+          style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}
           onClick={() => setShowGuide(false)}>
           <div
-            className="w-full rounded-t-3xl p-6 asi"
+            className="w-full rounded-t-3xl p-6"
             style={{ background: '#1a1a1f', border: '1px solid rgba(255,255,255,0.1)' }}
             onClick={e => e.stopPropagation()}>
             <div className="w-10 h-1 rounded-full mx-auto mb-6"
@@ -177,11 +179,9 @@ export default function InstallPWA({ className = '' }) {
                 </div>
               ))}
             </div>
-            <button onClick={() => setShowGuide(false)} className="btn-primary">
-              Понял, закрыть
-            </button>
+            <button onClick={() => setShowGuide(false)} className="btn-primary">Понял, закрыть</button>
             <button
-              onClick={() => { setShowGuide(false); dismiss() }}
+              onClick={() => { setShowGuide(false); hideForever() }}
               className="w-full mt-3 py-3 text-[13px] text-center"
               style={{ color: 'rgba(255,255,255,0.25)' }}>
               Больше не показывать

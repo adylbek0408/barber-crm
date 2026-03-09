@@ -8,25 +8,27 @@
     <meta name="theme-color" content="#09090b" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- PWA: отображение как приложение (скрыть браузерный UI) -->
+    <!-- PWA: отображение как приложение -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="BarberCRM" />
 
-    <!-- Иконки для iOS (Apple не использует manifest) -->
-    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
-    <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png" />
+    <!-- iOS иконки — ОБЯЗАТЕЛЬНО для "На экран Домой" -->
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192.png" />
 
     <!-- Иконка для браузера -->
     <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
 
-    <!-- SEO / описание -->
+    <!-- SEO -->
     <meta name="description" content="CRM система для барбершопов" />
     <meta name="application-name" content="BarberCRM" />
 
-    <!-- Убрать подсветку тапа на iOS -->
     <style>
       * { -webkit-tap-highlight-color: transparent; }
       body { overscroll-behavior: none; }
