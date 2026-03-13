@@ -15,7 +15,7 @@ class BarbershopSerializer(serializers.ModelSerializer):
     class Meta:
         model = Barbershop
         fields = ['id', 'name', 'owner_name', 'phone', 'address', 'is_active',
-                  'created_at', 'subscription']
+                  'has_shop_admin', 'created_at', 'subscription']
         read_only_fields = ['id', 'created_at']
 
 
@@ -27,13 +27,33 @@ class BranchSerializer(serializers.ModelSerializer):
 
 
 class CreateBarbershopSerializer(serializers.ModelSerializer):
-    """Для создания барбершопа (платформ-админом)"""
+    """Для создания барбершопа (платформ-админом). При has_shop_admin=True — обязательны поля администратора."""
     username = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True)
+    has_shop_admin = serializers.BooleanField(default=False, write_only=True)
+    shop_admin_first_name = serializers.CharField(required=False, allow_blank=True, write_only=True)
+    shop_admin_last_name = serializers.CharField(required=False, allow_blank=True, write_only=True)
+    shop_admin_username = serializers.CharField(required=False, allow_blank=True, write_only=True)
+    shop_admin_password = serializers.CharField(required=False, allow_blank=True, write_only=True)
 
     class Meta:
         model = Barbershop
-        fields = ['name', 'owner_name', 'phone', 'address', 'username', 'password']
+        fields = [
+            'name', 'owner_name', 'phone', 'address',
+            'username', 'password',
+            'has_shop_admin',
+            'shop_admin_first_name', 'shop_admin_last_name',
+            'shop_admin_username', 'shop_admin_password',
+        ]
+
+    def validate(self, attrs):
+        if attrs.get('has_shop_admin'):
+            for key in ('shop_admin_first_name', 'shop_admin_last_name', 'shop_admin_username', 'shop_admin_password'):
+                if not (attrs.get(key) or '').strip():
+                    raise serializers.ValidationError(
+                        {key: 'Обязательно при «Есть администратор барбершопа»'}
+                    )
+        return attrs
 
     def create(self, validated_data):
         from apps.accounts.models import User
@@ -41,6 +61,11 @@ class CreateBarbershopSerializer(serializers.ModelSerializer):
 
         username = validated_data.pop('username')
         password = validated_data.pop('password')
+        has_shop_admin = validated_data.pop('has_shop_admin', False)
+        shop_admin_first_name = (validated_data.pop('shop_admin_first_name', '') or '').strip()
+        shop_admin_last_name = (validated_data.pop('shop_admin_last_name', '') or '').strip()
+        shop_admin_username = (validated_data.pop('shop_admin_username', '') or '').strip()
+        shop_admin_password = (validated_data.pop('shop_admin_password', '') or '').strip()
 
         # Создаём пользователя-владельца
         owner_name = (validated_data.get('owner_name') or '').strip()
@@ -56,7 +81,18 @@ class CreateBarbershopSerializer(serializers.ModelSerializer):
             last_name=last_name,
         )
 
-        barbershop = Barbershop.objects.create(owner=user, **validated_data)
+        barbershop = Barbershop.objects.create(owner=user, has_shop_admin=has_shop_admin, **validated_data)
+
+        if has_shop_admin and shop_admin_username:
+            shop_admin_user = User.objects.create_user(
+                username=shop_admin_username,
+                password=shop_admin_password,
+                role=User.ROLE_SHOP_ADMIN,
+                first_name=shop_admin_first_name,
+                last_name=shop_admin_last_name,
+            )
+            barbershop.shop_admin = shop_admin_user
+            barbershop.save(update_fields=['shop_admin'])
 
         # Создаём пробную подписку на 30 дней
         Subscription.objects.create(

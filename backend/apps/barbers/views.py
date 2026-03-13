@@ -1,13 +1,22 @@
 from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
-from apps.accounts.permissions import IsOwner, IsBarber, IsOwnerOrBarber
+from apps.accounts.permissions import IsOwner, IsBarber, IsOwnerOrBarber, IsOwnerOrShopAdmin, IsOwnerOrBarberOrShopAdmin
 from .models import Barber, Service
 from .serializers import BarberSerializer, CreateBarberSerializer, ServiceSerializer
 
 
+def _barbershop_for_request(request):
+    """Барбершоп для владельца или администратора барбершопа."""
+    if request.user.is_owner() and hasattr(request.user, 'barbershop'):
+        return request.user.barbershop
+    if request.user.is_shop_admin() and hasattr(request.user, 'managed_barbershop'):
+        return request.user.managed_barbershop
+    return None
+
+
 class BarberViewSet(viewsets.ModelViewSet):
-    """Управление барберами — для владельца"""
-    permission_classes = [IsOwner]
+    """Управление барберами — для владельца и администратора барбершопа (чтение для shop_admin)"""
+    permission_classes = [IsOwnerOrShopAdmin]
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -15,19 +24,35 @@ class BarberViewSet(viewsets.ModelViewSet):
         return BarberSerializer
 
     def get_queryset(self):
+        barbershop = _barbershop_for_request(self.request)
+        if not barbershop:
+            return Barber.objects.none()
         return Barber.objects.filter(
-            branch__barbershop=self.request.user.barbershop
+            branch__barbershop=barbershop
         ).prefetch_related('services')
+
+    def perform_create(self, serializer):
+        # Создавать барберов может только владелец
+        if not self.request.user.is_owner():
+            raise PermissionDenied('Только владелец может добавлять барберов.')
+        barbershop = _barbershop_for_request(self.request)
+        if not barbershop:
+            raise PermissionDenied('Барбершоп не найден.')
+        branch = serializer.validated_data.get('branch')
+        if branch and branch.barbershop_id != barbershop.id:
+            raise PermissionDenied('Филиал не принадлежит вашему барбершопу.')
+        serializer.save()
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
     """
     Управление услугами.
     - Владелец: видит и управляет всеми услугами своего барбершопа.
+    - Администратор барбершопа: видит все услуги (для записи от имени барбера).
     - Барбер: видит и управляет только своими услугами.
     """
     serializer_class = ServiceSerializer
-    permission_classes = [IsOwnerOrBarber]
+    permission_classes = [IsOwnerOrBarberOrShopAdmin]
 
     def get_queryset(self):
         user = self.request.user
@@ -36,9 +61,13 @@ class ServiceViewSet(viewsets.ModelViewSet):
         if user.is_barber():
             return Service.objects.filter(barber__user=user)
 
-        # Владелец видит все услуги своего барбершопа
+        # Владелец или администратор барбершопа
+        barbershop = _barbershop_for_request(self.request)
+        if not barbershop:
+            return Service.objects.none()
         qs = Service.objects.filter(
-            barber__branch__barbershop=user.barbershop
+            barber__branch__barbershop=barbershop,
+            is_active=True,
         )
         barber_id = self.request.query_params.get('barber')
         if barber_id:
@@ -54,8 +83,20 @@ class ServiceViewSet(viewsets.ModelViewSet):
                 raise PermissionDenied('У вашего аккаунта нет профиля барбера.')
             serializer.save(barber=user.barber_profile)
         else:
-            # Владелец указывает barber в теле запроса
-            serializer.save()
+            # Владелец/админ барбершопа: barber в теле запроса (в сериализаторе barber в read_only, передаём явно)
+            barbershop = _barbershop_for_request(self.request)
+            if not barbershop:
+                raise PermissionDenied('Барбершоп не найден.')
+            barber_id = self.request.data.get('barber')
+            if not barber_id:
+                raise PermissionDenied('Укажите барбера (barber).')
+            barber = Barber.objects.filter(
+                branch__barbershop=barbershop,
+                id=barber_id,
+            ).first()
+            if not barber:
+                raise PermissionDenied('Барбер не найден или не из вашего барбершопа.')
+            serializer.save(barber=barber)
 
     def perform_update(self, serializer):
         user = self.request.user

@@ -7,6 +7,12 @@ class Barbershop(models.Model):
         User, on_delete=models.CASCADE, related_name='barbershop',
         null=True, blank=True   # ← admin создаёт owner сам в save_model
     )
+    # Если True — записи/оплаты ведёт администратор барбершопа, барберы не могут создавать записи
+    has_shop_admin = models.BooleanField(default=False, verbose_name='Есть администратор барбершопа')
+    shop_admin = models.OneToOneField(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='managed_barbershop', verbose_name='Администратор барбершопа'
+    )
     name = models.CharField(max_length=200, verbose_name='Название')
     owner_name = models.CharField(max_length=200, verbose_name='Имя владельца')
     phone = models.CharField(max_length=20, verbose_name='Телефон')
