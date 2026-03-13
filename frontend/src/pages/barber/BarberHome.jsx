@@ -65,6 +65,7 @@ export default function BarberHome() {
 
   const time = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
   const date = new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
+  const canCreateAppointments = !user?.barbershop_has_shop_admin
 
   return (
     <div className="page min-h-screen flex flex-col">
@@ -111,7 +112,7 @@ export default function BarberHome() {
       {/* Табы */}
       <div className="px-4 sm:px-5 pb-3 flex gap-2">
         {[
-          { id: TAB.WORK, label: 'Запись' },
+          ...(canCreateAppointments ? [{ id: TAB.WORK, label: 'Запись' }] : []),
           { id: TAB.SERVICES, label: 'Мои услуги' },
         ].map((t) => (
           <button key={t.id} onClick={() => { setTab(t.id); if (t.id === TAB.WORK) reset() }}
@@ -125,8 +126,15 @@ export default function BarberHome() {
         ))}
       </div>
 
+      {!canCreateAppointments && (
+        <div className="mx-4 sm:mx-5 mb-4 px-4 py-3 rounded-xl text-[13px]"
+          style={{ background: 'var(--bg-card)', border: '1px solid var(--bd)', color: 'var(--tx-3)' }}>
+          Записи и оплаты в этом барбершопе ведёт администратор. Вы можете управлять только своими услугами.
+        </div>
+      )}
+
       {/* ══════════ ТАБ: ЗАПИСЬ ══════════ */}
-      {tab === TAB.WORK && (
+      {tab === TAB.WORK && canCreateAppointments && (
         <>
           {step === S.SELECT && (
             <main className="flex-1 flex flex-col px-4 pb-8">
@@ -339,7 +347,7 @@ export default function BarberHome() {
       )}
 
       {/* ══════════ ТАБ: МОИ УСЛУГИ ══════════ */}
-      {tab === TAB.SERVICES && (
+      {(tab === TAB.SERVICES || !canCreateAppointments) && (
         <main className="flex-1 flex flex-col px-4 pb-8">
           <div className="mb-5">
             <h2 className="text-[24px] font-black" style={{ color: 'var(--tx)' }}>Мои услуги</h2>

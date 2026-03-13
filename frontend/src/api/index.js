@@ -50,3 +50,10 @@ export const adminApi = {
   createBarbershop: (data) => api.post('/admin/barbershops/', data),
   toggleActive: (id) => api.post(`/admin/barbershops/${id}/toggle_active/`),
 }
+
+export const shopAdminApi = {
+  getBarbers: () => api.get('/barbers/'),
+  getServices: (barberId) => api.get('/services/', { params: barberId ? { barber: barberId } : {} }),
+  getAppointments: () => api.get('/shop-admin/appointments/'),
+  createAppointment: (data) => api.post('/shop-admin/appointments/', data),
+}

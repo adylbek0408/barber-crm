@@ -27,6 +27,7 @@ import OwnerDashboard from './pages/owner/OwnerDashboard'
 import OwnerBarbers from './pages/owner/OwnerBarbers'
 import OwnerBranches from './pages/owner/OwnerBranches'
 import AdminDashboard from './pages/admin/AdminDashboard'
+import ShopAdminHome from './pages/shopadmin/ShopAdminHome'
 
 function PrivateRoute({ children, role }) {
   const { user, token } = useAuthStore()
@@ -65,11 +66,17 @@ export default function App() {
         <PrivateRoute role="platform_admin"><AdminDashboard /></PrivateRoute>
       } />
 
+      {/* Администратор барбершопа */}
+      <Route path="/shop-admin" element={
+        <PrivateRoute role="shop_admin"><ShopAdminHome /></PrivateRoute>
+      } />
+
       {/* Редирект по роли */}
       <Route path="/" element={
         user?.role === 'barber' ? <Navigate to="/barber" /> :
         user?.role === 'owner' ? <Navigate to="/owner" /> :
         user?.role === 'platform_admin' ? <Navigate to="/admin" /> :
+        user?.role === 'shop_admin' ? <Navigate to="/shop-admin" /> :
         <Navigate to="/login" />
       } />
     </Routes>

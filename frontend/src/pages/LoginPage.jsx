@@ -19,11 +19,12 @@ export default function LoginPage() {
     setLoading(true); setErr('')
     try {
       const res = await authApi.login(username.trim(), password)
-      const { access, refresh, role, full_name } = res.data
-      setAuth(access, refresh, { role, full_name, username: username.trim() })
+      const { access, refresh, role, full_name, barbershop_has_shop_admin } = res.data
+      setAuth(access, refresh, { role, full_name, username: username.trim(), barbershop_has_shop_admin: !!barbershop_has_shop_admin })
       if (role === 'barber') navigate('/barber')
       else if (role === 'owner') navigate('/owner')
       else if (role === 'platform_admin') navigate('/admin')
+      else if (role === 'shop_admin') navigate('/shop-admin')
     } catch (e) {
       if (e.code === 'ERR_NETWORK') setErr('Сервер недоступен')
       else if (e.response?.status === 401) setErr('Неверный логин или пароль')

@@ -35,11 +35,20 @@ export default function OwnerBarbers() {
 
   useEffect(() => { load() }, [])
 
+  function errMsg(e, fallback = 'Ошибка') {
+    const d = e.response?.data
+    if (typeof d?.detail === 'string') return d.detail
+    if (d?.barber?.[0]) return d.barber[0]
+    if (d?.name?.[0]) return d.name[0]
+    if (d?.price?.[0]) return d.price[0]
+    return fallback
+  }
+
   async function load() {
     try {
       const [b, br] = await Promise.all([ownerApi.getBarbers(), ownerApi.getBranches()])
       setBarbers(b.data); setBranches(br.data)
-    } catch { toast.error('Ошибка загрузки') }
+    } catch (e) { toast.error(errMsg(e, 'Ошибка загрузки')) }
   }
 
   function setField(key, val) { setForm(f => ({ ...f, [key]: val })) }
@@ -55,7 +64,7 @@ export default function OwnerBarbers() {
       setShowForm(false)
       setForm({ first_name: '', last_name: '', phone: '', branch: '', username: '', password: '' })
       load()
-    } catch { toast.error('Ошибка') }
+    } catch (e) { toast.error(errMsg(e)) }
     finally { setLoading(false) }
   }
 
@@ -66,7 +75,7 @@ export default function OwnerBarbers() {
       toast.success('Барбер удалён')
       setDeleteBarber(null)
       load()
-    } catch { toast.error('Ошибка удаления') }
+    } catch (e) { toast.error(errMsg(e, 'Ошибка удаления')) }
     finally { setDeletingBarber(false) }
   }
 
@@ -76,7 +85,7 @@ export default function OwnerBarbers() {
       await ownerApi.createService({ barber: bid, ...svc })
       toast.success('Услуга добавлена')
       setSvcForm(null); setSvc({ name: '', price: '' }); load()
-    } catch { toast.error('Ошибка') }
+    } catch (e) { toast.error(errMsg(e)) }
   }
 
   async function saveEditSvc() {
@@ -86,7 +95,7 @@ export default function OwnerBarbers() {
       await ownerApi.updateService(editSvc, { name: editSvcData.name, price: editSvcData.price })
       toast.success('Услуга обновлена')
       setEditSvc(null); load()
-    } catch { toast.error('Ошибка') }
+    } catch (e) { toast.error(errMsg(e)) }
     finally { setSavingSvc(false) }
   }
 
@@ -96,7 +105,7 @@ export default function OwnerBarbers() {
       await ownerApi.deleteService(deleteSvc)
       toast.success('Услуга удалена')
       setDeleteSvc(null); load()
-    } catch { toast.error('Ошибка') }
+    } catch (e) { toast.error(errMsg(e, 'Ошибка удаления')) }
     finally { setDeletingSvc(false) }
   }
 

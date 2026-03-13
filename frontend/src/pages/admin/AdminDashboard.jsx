@@ -10,11 +10,15 @@ const FIELDS = [
   { key: 'owner_name', placeholder: 'Имя владельца' },
   { key: 'phone',      placeholder: 'Телефон' },
   { key: 'address',    placeholder: 'Адрес' },
-  { key: 'username',   placeholder: 'Логин для входа' },
-  { key: 'password',   placeholder: 'Пароль', type: 'password' },
+  { key: 'username',   placeholder: 'Логин владельца для входа' },
+  { key: 'password',   placeholder: 'Пароль владельца', type: 'password' },
 ]
 
-const EMPTY = { name: '', owner_name: '', phone: '', address: '', username: '', password: '' }
+const EMPTY = {
+  name: '', owner_name: '', phone: '', address: '', username: '', password: '',
+  has_shop_admin: false,
+  shop_admin_first_name: '', shop_admin_last_name: '', shop_admin_username: '', shop_admin_password: '',
+}
 
 export default function AdminDashboard() {
   const { logout } = useAuthStore()
@@ -109,6 +113,31 @@ export default function AdminDashboard() {
                 className="input-field"
               />
             ))}
+            <label className="flex items-center gap-3 cursor-pointer py-2">
+              <input type="checkbox" checked={!!form.has_shop_admin}
+                onChange={(e) => setForm(f => ({ ...f, has_shop_admin: e.target.checked }))}
+                className="w-5 h-5 rounded border-2" style={{ accentColor: 'var(--tx)' }} />
+              <span className="text-[14px] font-medium" style={{ color: 'var(--tx)' }}>
+                Есть администратор барбершопа (записи и оплаты ведёт он, барберы не создают записи)
+              </span>
+            </label>
+            {form.has_shop_admin && (
+              <div className="space-y-3 pt-2" style={{ borderTop: '1px solid var(--bd)' }}>
+                <p className="text-[13px] font-semibold" style={{ color: 'var(--tx-3)' }}>Данные администратора барбершопа</p>
+                <input type="text" placeholder="Имя" value={form.shop_admin_first_name}
+                  onChange={(e) => setForm(f => ({ ...f, shop_admin_first_name: e.target.value }))}
+                  className="input-field" />
+                <input type="text" placeholder="Фамилия" value={form.shop_admin_last_name}
+                  onChange={(e) => setForm(f => ({ ...f, shop_admin_last_name: e.target.value }))}
+                  className="input-field" />
+                <input type="text" placeholder="Логин" value={form.shop_admin_username}
+                  onChange={(e) => setForm(f => ({ ...f, shop_admin_username: e.target.value }))}
+                  autoCapitalize="none" className="input-field" />
+                <input type="password" placeholder="Пароль" value={form.shop_admin_password}
+                  onChange={(e) => setForm(f => ({ ...f, shop_admin_password: e.target.value }))}
+                  className="input-field" />
+              </div>
+            )}
             <button onClick={handleCreate} disabled={loading} className="btn-primary">
               {loading ? 'Создаём...' : 'Создать'}
             </button>
